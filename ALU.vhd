@@ -45,7 +45,7 @@ use work.all;
 entity ALU is
     generic(n: integer := 16;
             registerLength: integer := 128);
-    Port ( wordIn : in STD_LOGIC_VECTOR (23 downto 0);
+    Port ( wordIn : in STD_LOGIC_VECTOR (24 downto 0);
            rs3 : in STD_LOGIC_VECTOR (127 downto 0);
            rs2 : in STD_LOGIC_VECTOR (127 downto 0);
            rs1 : in STD_LOGIC_VECTOR (127 downto 0);
@@ -57,8 +57,8 @@ architecture Behavioral of ALU is
 
 --------Procedure to compute the bitwiseOR used in R3 instruction type------
 
-    procedure bitwiseOR(signal r1, r2: in std_logic_vector(n-1 downto 0);
-                        signal rd: out std_logic_vector(n-1 downto 0)) is
+    procedure bitwiseOR(signal r1, r2: in std_logic_vector(registerLength-1 downto 0);
+                        signal rd: out std_logic_vector(registerLength-1 downto 0)) is
     begin
         rd <= r1 or r2;
               
@@ -67,8 +67,8 @@ architecture Behavioral of ALU is
  
  --------Procedure to compute the bitwiseAND used in R3 instruction type------
 
-    procedure bitwiseAND(signal r1, r2: in std_logic_vector(n-1 downto 0);
-                        signal rd: out std_logic_vector(n-1 downto 0)) is
+    procedure bitwiseAND(signal r1, r2: in std_logic_vector(registerLength-1 downto 0);
+                        signal rd: out std_logic_vector(registerLength-1 downto 0)) is
     begin
         rd <= r1 and r2;
               
@@ -76,8 +76,8 @@ architecture Behavioral of ALU is
  ----------------------------------------------------------------------------
 
 
-    procedure ROTW(signal rs1, rs2: in std_logic_vector(n-1 downto 0);
-                        signal rd: out std_logic_vector(n-1 downto 0)) is
+    procedure ROTW(signal rs1, rs2: in std_logic_vector(registerLength-1 downto 0);
+                        signal rd: out std_logic_vector(registerLength-1 downto 0)) is
         variable temp: std_logic_vector(registerLength-1 downto 0);
     begin
         --ROTW: rotate bits in word : the contents of each 32-bit field in register rs1 
@@ -125,23 +125,22 @@ type r4Format is(intMulAddLo, intMulAddHi, intMulSubLo, intMulSubHi, longMulAddL
 
       signal selectOpcode : OPCODE;
       signal r4: r4Format;
-      
+	  
+	  
     
       
       
 begin
     ALUProcess: process (all)
-    
-    -- For Load Immediate
+    	   -- For Load Immediate
     variable loadIndex: integer;
-    variable immValue: std_logic_vector(15 downto 0);
-    
-    
+   
     --A variable temp that can be used for any part of the ALU. Assume this will be overwritten for every new process
     variable temp: std_logic_vector(127 downto 0);
     variable intTemp: integer;
     
-    begin
+    begin				
+		
     if (wordIn(23) = '0') then
         --If wordIn[24] == 0, then we load Immediate
         
@@ -154,10 +153,10 @@ begin
         loadIndex := to_integer(unsigned(wordIn(23 downto 21)));
         
         --Store the immediate value
-        immValue := wordIn(20 downto 5);
+        temp(15 downto 0) := wordIn(20 downto 5);
         
         --Write it to the paticular register index required
-        rd((loadIndex+1)*16-1 downto (loadIndex*16)) <= immValue;
+        rd((loadIndex+1)*16-1 downto (loadIndex*16)) <= temp(15 downto 0);
   
     
     elsif (wordIn(23) = '0') then

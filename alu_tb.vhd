@@ -41,7 +41,7 @@ architecture Behavioral of ALU_TB is
     -- Control Signals - Necessary for process to show us the output on the graph
     signal clk: std_logic := '0';
     -- Stimulus signals - signals mapped to the input and inout ports of tested entity
-    signal wordIn: STD_LOGIC_VECTOR (23 downto 0);
+    signal wordIn: STD_LOGIC_VECTOR (24 downto 0);
     signal rs3: std_logic_vector(registerLength-1 downto 0);
     signal rs2: std_logic_vector(registerLength-1 downto 0);
     signal rs1: std_logic_vector(registerLength-1 downto 0);
@@ -62,19 +62,46 @@ begin
         testing: process
         begin
             -- Testing the load immediate Function
-            -- wordIn can be something like 0 001 0000111100001111 0000
-            -- This will load 0x0F0F into the first 16 bits of register rd
-            wordIn <= "000100001111000011110000";
+            -- wordIn can be something like 0 001 0000 1111 0000 1111 00000
+            -- This will load 0x0F0F into the second 16 bits of register rd
+            wordIn <= "0001000011110000111100000";
             
             wait for 15 ns;
             
             -- Testing the load immediate Function
-            -- wordIn can be something like 0 010 1100111100101111 0000
-            -- This will load 0xCF2F into the last 16 bits of register rd
-            wordIn <= "001011001111001011110000"; 
+            -- wordIn can be something like 0 010 1100111100101111 00000
+            -- This will load 0xCF2F into the third 16 bits of register rd
+            wordIn <= "0010110011110010111100000"; 
 			
-			wait for 15 ns;			
-            
+			wait for 15 ns;		
+			
+			-- Testing the load immediate Function
+            -- wordIn can be something like 0 010 1100000000100011 00000
+            -- This will load 0xC023 into the last 16 bits of register rd
+            wordIn <= "0010110000000010001100000"; 
+			
+			wait for 15 ns;		
+			
+			--Testing for bitwiseOR
+			--Set the first 32 bits of rs1 to 1, then others to 0  
+			--Set the last 32 bits of rs2 to 1, then others to 0 
+			-- wordIn is 1 1 0000 0101 00000 00000 00000
+			wordIn <= "1100000101000000000000000";
+			rs1 <= (127 downto 95 => '1', others => '0');
+			rs2 <= (31 downto 0 => '1', others => '0');  
+			
+			
+			wait for 15 ns;	
+			
+			--Testing for bitwiseAND
+			--Set the first 32 bits of rs1 to 1, then others to 0  
+			--Set the last 32 bits of rs2 to 1, then others to 0 
+			-- wordIn is 1 1 0000 1011 00000 00000 00000
+			wordIn <= "1100001011000000000000000";
+			rs1 <= (127 downto 95 => '1', others => '0');
+			rs2 <= (100 downto 80 => '1', others => '0');
+			
+			wait for 15 ns;
                     
         end process;
 end Behavioral;
