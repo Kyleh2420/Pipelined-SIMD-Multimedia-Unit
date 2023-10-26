@@ -55,7 +55,7 @@ end ALU;
 
 architecture Behavioral of ALU is
 
---------Procedure to compute the bitwiseOR used in R3 instruction type------
+---0101-Procedure to compute the bitwiseOR used in R3 instruction type---------------
 
     procedure bitwiseOR(signal r1, r2: in std_logic_vector(registerLength-1 downto 0);
                         signal rd: out std_logic_vector(registerLength-1 downto 0)) is
@@ -63,9 +63,9 @@ architecture Behavioral of ALU is
         rd <= r1 or r2;
               
     end bitwiseOR;
- ----------------------------------------------------------------------------
+ ------------------------------------------------------------------------------------
  
- --------Procedure to compute the bitwiseAND used in R3 instruction type------
+ ---1011-Procedure to compute the bitwiseAND used in R3 instruction type-------------
 
     procedure bitwiseAND(signal r1, r2: in std_logic_vector(registerLength-1 downto 0);
                         signal rd: out std_logic_vector(registerLength-1 downto 0)) is
@@ -73,14 +73,24 @@ architecture Behavioral of ALU is
         rd <= r1 and r2;
               
     end bitwiseAND;
- ----------------------------------------------------------------------------
+ -----------------------------------------------------------------------------------
+ 
+  ---1100-Procedure to compute INVB used in R3 instruction type-------------
 
+    procedure INVB(signal r1, r2: in std_logic_vector(registerLength-1 downto 0);
+                        signal rd: out std_logic_vector(registerLength-1 downto 0)) is
+    begin
+        rd <= not r1;
+              
+    end INVB;
+ -----------------------------------------------------------------------------------
 
+ ---1101-Procedure to compute the ROTW used in R3 instruction type------------------
     procedure ROTW(signal rs1, rs2: in std_logic_vector(registerLength-1 downto 0);
                         signal rd: out std_logic_vector(registerLength-1 downto 0)) is
         variable temp: std_logic_vector(registerLength-1 downto 0);
 		variable offset: integer;	
-		variable wordCount: integer;
+		variable wordIndex: integer;
 		variable leftBit: integer;
     begin
         --ROTW: rotate bits in word : the contents of each 32-bit field in register rs1 
@@ -98,52 +108,87 @@ architecture Behavioral of ALU is
             
             -- Zeroth word 
 			--Corresponding 5 bits is: 5-0
-			wordCount := 0;
-			leftBit := to_integer(unsigned(rs2( (wordCount * registerLength / 4) + 4 downto (wordCount * registerLength / 4))));
+			wordIndex := 0;
+			leftBit := to_integer(unsigned(rs2( (wordIndex * registerLength / 4) + 4 downto (wordIndex * registerLength / 4))));
             leftBit := leftBit-1;
-			offset := (wordCount * registerLength / 4);
+			offset := (wordIndex * registerLength / 4);
 			
-			temp(leftBit downto 0) := rs1(32*wordCount+leftBit downto 32*wordCount);
-            rd(32-leftBit-2+offset downto offset) <= rs1(32*(wordCount+1)-1 downto leftBit+1+32*wordCount);
-            rd(32*(wordCount+1)-1 downto 32*(wordCount+1)-1-leftBit) <= temp(leftBit downto 0);  
+			temp(leftBit downto 0) := rs1(32*wordIndex+leftBit downto 32*wordIndex);
+            rd(32-leftBit-2+offset downto offset) <= rs1(32*(wordIndex+1)-1 downto leftBit+1+32*wordIndex);
+            rd(32*(wordIndex+1)-1 downto 32*(wordIndex+1)-1-leftBit) <= temp(leftBit downto 0);  
 			
 			
 			-- First word 
 			--Corresponding 5 bits is: 5-0
-			wordCount := 1;
-			leftBit := to_integer(unsigned(rs2( (wordCount * registerLength / 4) + 4 downto (wordCount * registerLength / 4))));
+			wordIndex := 1;
+			leftBit := to_integer(unsigned(rs2( (wordIndex * registerLength / 4) + 4 downto (wordIndex * registerLength / 4))));
             leftBit := leftBit-1;
-			offset := (wordCount * registerLength / 4);
+			offset := (wordIndex * registerLength / 4);
 			
-			temp(leftBit downto 0) := rs1(32*wordCount+leftBit downto 32*wordCount);
-            rd(32-leftBit-2+offset downto offset) <= rs1(32*(wordCount+1)-1 downto leftBit+1+32*wordCount);
-            rd(32*(wordCount+1)-1 downto 32*(wordCount+1)-1-leftBit) <= temp(leftBit downto 0);
+			temp(leftBit downto 0) := rs1(32*wordIndex+leftBit downto 32*wordIndex);
+            rd(32-leftBit-2+offset downto offset) <= rs1(32*(wordIndex+1)-1 downto leftBit+1+32*wordIndex);
+            rd(32*(wordIndex+1)-1 downto 32*(wordIndex+1)-1-leftBit) <= temp(leftBit downto 0);
 			
 			-- Second word 
 			--Corresponding 5 bits is: 5-0
-			wordCount := 2;
-			leftBit := to_integer(unsigned(rs2( (wordCount * registerLength / 4) + 4 downto (wordCount * registerLength / 4))));
+			wordIndex := 2;
+			leftBit := to_integer(unsigned(rs2( (wordIndex * registerLength / 4) + 4 downto (wordIndex * registerLength / 4))));
             leftBit := leftBit-1;
-			offset := (wordCount * registerLength / 4);
+			offset := (wordIndex * registerLength / 4);
 			
-			temp(leftBit downto 0) := rs1(32*wordCount+leftBit downto 32*wordCount);
-            rd(32-leftBit-2+offset downto offset) <= rs1(32*(wordCount+1)-1 downto leftBit+1+32*wordCount);
-            rd(32*(wordCount+1)-1 downto 32*(wordCount+1)-1-leftBit) <= temp(leftBit downto 0);
+			temp(leftBit downto 0) := rs1(32*wordIndex+leftBit downto 32*wordIndex);
+            rd(32-leftBit-2+offset downto offset) <= rs1(32*(wordIndex+1)-1 downto leftBit+1+32*wordIndex);
+            rd(32*(wordIndex+1)-1 downto 32*(wordIndex+1)-1-leftBit) <= temp(leftBit downto 0);
 			
 			-- Third word 
 			--Corresponding 5 bits is: 5-0
-			wordCount := 3;
-			leftBit := to_integer(unsigned(rs2( (wordCount * registerLength / 4) + 4 downto (wordCount * registerLength / 4))));
+			wordIndex := 3;
+			leftBit := to_integer(unsigned(rs2( (wordIndex * registerLength / 4) + 4 downto (wordIndex * registerLength / 4))));
             leftBit := leftBit-1;
-			offset := (wordCount * registerLength / 4);
+			offset := (wordIndex * registerLength / 4);
 			
-			temp(leftBit downto 0) := rs1(32*wordCount+leftBit downto 32*wordCount);
-            rd(32-leftBit-2+offset downto offset) <= rs1(32*(wordCount+1)-1 downto leftBit+1+32*wordCount);
-            rd(32*(wordCount+1)-1 downto 32*(wordCount+1)-1-leftBit) <= temp(leftBit downto 0);
+			temp(leftBit downto 0) := rs1(32*wordIndex+leftBit downto 32*wordIndex);
+            rd(32-leftBit-2+offset downto offset) <= rs1(32*(wordIndex+1)-1 downto leftBit+1+32*wordIndex);
+            rd(32*(wordIndex+1)-1 downto 32*(wordIndex+1)-1-leftBit) <= temp(leftBit downto 0);
               
     end ROTW;
  ----------------------------------------------------------------------------
+---1110-Procedure to subtract word from unsigned used in R3 instruction type-------------
 
+	procedure SFWU(signal r1, r2: in std_logic_vector(registerLength-1 downto 0);
+					signal rd: out std_logic_vector(registerLength-1 downto 0)) is
+		variable wordIndex: integer;
+		variable int1: unsigned((registerLength / 4) - 1 downto 0);
+		variable int2: unsigned((registerLength / 4) - 1 downto 0);
+		variable maxBit: integer;
+		variable minBit: integer;
+    begin
+        wordIndex := 0;	
+		maxBit := ( (wordIndex+1) * registerLength / 4) - 1;
+		minBit := ( (wordIndex) * registerLength / 4);
+		
+		int1 := unsigned(r1(maxBit downto minBit));
+		int2 :=	unsigned(r2(maxBit downto minBit));
+		
+		--This is what I thought of at first
+		--rd(maxBit downto minBit) <=  std_logic_vector(int2 - int1);
+		--Turns out VHDL does the subtraction as a twos compliment, but interpets the result as unsigned
+		--So 5-7 = 14 (0101 - 0111 = 1110), which makes sense as twos compliment in binary
+		--However, I don't believe that's what the essence of this instruction is. Therefore, I am
+		--programing this to simply find the difference between the two values.
+		
+		if (int1 < int2) then
+			rd(maxBit downto minBit) <=  std_logic_vector(int2 - int1);
+		elsif (int1 > int2) then
+			rd(maxBit downto minBit) <=  std_logic_vector(int1 - int2);
+		else
+			rd(maxBit downto minBit) <= (others => '0');
+		end if;
+    end SFWU;
+-----------------------------------------------------------------------------------
+ 
+ 
+ 
 --Enumerate the various options available
 --NUL is our effective NULL, since that is a reserved keyword. In our case, NUL means that option is not selected
 type OPCODE is (NOP, SHRHI, AU, CNT1H, AHS, ORopcode, BCW, MAXWS, MINWS, MLHU, MLHSS, ANDopcode, INVB, ROTW, SFWU, SFHS, NUL);
@@ -217,9 +262,9 @@ begin
             when "1001" => selectOpcode <= MLHU;
             when "1010" => selectOpcode <= MLHSS;
             when "1011" => bitwiseAND(rs1, rs2, rd);
-            when "1100" => selectOpcode <= INVB;
+            when "1100" => INVB(rs1, rs2, rd);
             when "1101" => ROTW(rs1, rs2, rd);
-            when "1110" => selectOpcode <= SFWU;
+            when "1110" => SFWU(rs1, rs2, rd);
             when "1111" => selectOpcode <= SFHS;
             when others => selectOpcode <= NUL;
         end case;

@@ -113,7 +113,48 @@ begin
 			rs1 <= (127 downto 95 => '1', others => '0');
 			rs2 <= (100 downto 80 => '1', others => '0');
 			
+			wait for 10 ns;
+			
+			--Testing for INVB
+			--Set the rs1 to all F
+			-- wordIn is 1 1 0000 1100 00000 00000 00000
+			wordIn <= "1100001100000000000000000";
+			rs1 <= (127 downto 0 => '1', others => '0');
+			
 			wait for 10 ns;	
+			
+			--Testing for INVB
+			--Set the rs1 to all 0
+			-- wordIn is 1 1 0000 1100 00000 00000 00000
+			wordIn <= "1100001100000000000000000";
+			rs1 <= (others => '0');
+			
+			wait for 10 ns;
+			
+			--Testing for SFWU
+			--Set last set of rs1 to 0x0100_0000, which is dec 16,777,216
+			--Set last set of rs2 to 0x1000_0000, which is dec 268,435,456
+			--Answer should be placed in last 32 bits of rd
+			--Answer is 0x0F00_0000, or 251,658,240
+			-- wordIn is 1 1 0000 1110 00000 00000 00000
+			wordIn <= "1100001110000000000000000";
+			rs1 <= X"00000000000000000000000000000002";
+			rs2 <= X"00000000000000000000000000000005";  
+			
+			wait for 10 ns;
+			
+			--Testing edge case for SFWU
+			--Set last set of rs2 to 0x0000_0005, which is dec 5
+			--Set last set of rs1 to 0x1000_0007, which is dec 7
+			--Answer should be placed in last 32 bits of rd
+			--Answer is negative when done in decimal.
+			--Answer is unknown right now.
+			-- wordIn is 1 1 0000 1110 00000 00000 00000
+			wordIn <= "1100001110000000000000000";
+			rs1 <= X"00000000000000000000000000000007";
+			rs2 <= X"00000000000000000000000000000005"; 
+			
+			wait for 10 ns;
 			
 			
                     
