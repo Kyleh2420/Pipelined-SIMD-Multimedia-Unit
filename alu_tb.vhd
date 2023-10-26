@@ -60,27 +60,39 @@ begin
                 rd => rd);
         
         testing: process
-        begin
+        begin		   
+			--Testing for ROTW
+			--Set the first 32 bits of rs1 to 1, then others to 0  
+			--Set the last 32 bits of rs2 to 1, then others to 0 
+			-- wordIn is 1 1 0000 1101 00000 00000 00000
+			--RS2 is hexadecimal "00000001 | 00000002 | 00000003 | 00000004"
+			wordIn <= "1100001101000000000000000";
+			rs1 <= X"0123456789ABCDEF0123456789ABCDEF";
+			rs2 <= X"0000000400000003000000040000001F";
+			
+			wait for 10 ns;
+			
+			
             -- Testing the load immediate Function
             -- wordIn can be something like 0 001 0000 1111 0000 1111 00000
             -- This will load 0x0F0F into the second 16 bits of register rd
             wordIn <= "0001000011110000111100000";
             
-            wait for 15 ns;
+            wait for 10 ns;
             
             -- Testing the load immediate Function
             -- wordIn can be something like 0 010 1100111100101111 00000
             -- This will load 0xCF2F into the third 16 bits of register rd
             wordIn <= "0010110011110010111100000"; 
 			
-			wait for 15 ns;		
+			wait for 10 ns;		
 			
 			-- Testing the load immediate Function
             -- wordIn can be something like 0 010 1100000000100011 00000
             -- This will load 0xC023 into the last 16 bits of register rd
             wordIn <= "0010110000000010001100000"; 
 			
-			wait for 15 ns;		
+			wait for 10 ns;		
 			
 			--Testing for bitwiseOR
 			--Set the first 32 bits of rs1 to 1, then others to 0  
@@ -91,7 +103,7 @@ begin
 			rs2 <= (31 downto 0 => '1', others => '0');  
 			
 			
-			wait for 15 ns;	
+			wait for 10 ns;	
 			
 			--Testing for bitwiseAND
 			--Set the first 32 bits of rs1 to 1, then others to 0  
@@ -101,7 +113,9 @@ begin
 			rs1 <= (127 downto 95 => '1', others => '0');
 			rs2 <= (100 downto 80 => '1', others => '0');
 			
-			wait for 15 ns;
+			wait for 10 ns;	
+			
+			
                     
         end process;
 end Behavioral;

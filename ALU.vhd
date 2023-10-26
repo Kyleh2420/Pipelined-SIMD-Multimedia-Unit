@@ -79,6 +79,9 @@ architecture Behavioral of ALU is
     procedure ROTW(signal rs1, rs2: in std_logic_vector(registerLength-1 downto 0);
                         signal rd: out std_logic_vector(registerLength-1 downto 0)) is
         variable temp: std_logic_vector(registerLength-1 downto 0);
+		variable offset: integer;	
+		variable wordCount: integer;
+		variable leftBit: integer;
     begin
         --ROTW: rotate bits in word : the contents of each 32-bit field in register rs1 
              --are rotated to the right according to the value of the 5 least significant bits 
@@ -93,26 +96,50 @@ architecture Behavioral of ALU is
             -- The following indicates the bit to be moved to the 0th index
             --      to_integer(unsigned(rs2(4 downto 0)))-1
             
-            -- Zeroth word
-            temp(to_integer(unsigned(rs2(4 downto 0))) downto 0) := rs1(32*0+to_integer(unsigned(rs2(4 downto 0))) downto 32*0);
-            rd(31-to_integer(unsigned(rs2(4 downto 0))) downto 0) <= rs1(8*(0+1)-1 downto to_integer(unsigned(rs2(4 downto 0)))+1+8*0);
-            rd(32*(0+1)-1 downto 32*(0+1)-1-to_integer(unsigned(rs2(4 downto 0)))) <= temp(to_integer(unsigned(rs2(4 downto 0))) downto 0);
-            
-            -- First word
-            temp(to_integer(unsigned(rs2(4 downto 0))) downto 0) := rs1(32*1+to_integer(unsigned(rs2(4 downto 0))) downto 32*1);
-            rd(31-to_integer(unsigned(rs2(4 downto 0))) downto 0) <= rs1(8*(1+1)-1 downto to_integer(unsigned(rs2(4 downto 0)))+1+8*1);
-            rd(32*(1+1)-1 downto 32*(1+1)-1-to_integer(unsigned(rs2(4 downto 0)))) <= temp(to_integer(unsigned(rs2(4 downto 0))) downto 0);
-            
-            -- Second word
-            temp(to_integer(unsigned(rs2(4 downto 0))) downto 0) := rs1(32*2+to_integer(unsigned(rs2(4 downto 0))) downto 32*2);
-            rd(31-to_integer(unsigned(rs2(4 downto 0))) downto 0) <= rs1(8*(2+1)-1 downto to_integer(unsigned(rs2(4 downto 0)))+1+8*2);
-            rd(32*(2+1)-1 downto 32*(2+1)-1-to_integer(unsigned(rs2(4 downto 0)))) <= temp(to_integer(unsigned(rs2(4 downto 0))) downto 0);
-            
-            -- Third word
-            temp(to_integer(unsigned(rs2(4 downto 0))) downto 0) := rs1(32*3+to_integer(unsigned(rs2(4 downto 0))) downto 32*3);
-            rd(31-to_integer(unsigned(rs2(4 downto 0))) downto 0) <= rs1(8*(3+1)-1 downto to_integer(unsigned(rs2(4 downto 0)))+1+8*3);
-            rd(32*(3+1)-1 downto 32*(3+1)-1-to_integer(unsigned(rs2(4 downto 0)))) <= temp(to_integer(unsigned(rs2(4 downto 0))) downto 0);
-        
+            -- Zeroth word 
+			--Corresponding 5 bits is: 5-0
+			wordCount := 0;
+			leftBit := to_integer(unsigned(rs2( (wordCount * registerLength / 4) + 4 downto (wordCount * registerLength / 4))));
+            leftBit := leftBit-1;
+			offset := (wordCount * registerLength / 4);
+			
+			temp(leftBit downto 0) := rs1(32*wordCount+leftBit downto 32*wordCount);
+            rd(32-leftBit-2+offset downto offset) <= rs1(32*(wordCount+1)-1 downto leftBit+1+32*wordCount);
+            rd(32*(wordCount+1)-1 downto 32*(wordCount+1)-1-leftBit) <= temp(leftBit downto 0);  
+			
+			
+			-- First word 
+			--Corresponding 5 bits is: 5-0
+			wordCount := 1;
+			leftBit := to_integer(unsigned(rs2( (wordCount * registerLength / 4) + 4 downto (wordCount * registerLength / 4))));
+            leftBit := leftBit-1;
+			offset := (wordCount * registerLength / 4);
+			
+			temp(leftBit downto 0) := rs1(32*wordCount+leftBit downto 32*wordCount);
+            rd(32-leftBit-2+offset downto offset) <= rs1(32*(wordCount+1)-1 downto leftBit+1+32*wordCount);
+            rd(32*(wordCount+1)-1 downto 32*(wordCount+1)-1-leftBit) <= temp(leftBit downto 0);
+			
+			-- Second word 
+			--Corresponding 5 bits is: 5-0
+			wordCount := 2;
+			leftBit := to_integer(unsigned(rs2( (wordCount * registerLength / 4) + 4 downto (wordCount * registerLength / 4))));
+            leftBit := leftBit-1;
+			offset := (wordCount * registerLength / 4);
+			
+			temp(leftBit downto 0) := rs1(32*wordCount+leftBit downto 32*wordCount);
+            rd(32-leftBit-2+offset downto offset) <= rs1(32*(wordCount+1)-1 downto leftBit+1+32*wordCount);
+            rd(32*(wordCount+1)-1 downto 32*(wordCount+1)-1-leftBit) <= temp(leftBit downto 0);
+			
+			-- Third word 
+			--Corresponding 5 bits is: 5-0
+			wordCount := 3;
+			leftBit := to_integer(unsigned(rs2( (wordCount * registerLength / 4) + 4 downto (wordCount * registerLength / 4))));
+            leftBit := leftBit-1;
+			offset := (wordCount * registerLength / 4);
+			
+			temp(leftBit downto 0) := rs1(32*wordCount+leftBit downto 32*wordCount);
+            rd(32-leftBit-2+offset downto offset) <= rs1(32*(wordCount+1)-1 downto leftBit+1+32*wordCount);
+            rd(32*(wordCount+1)-1 downto 32*(wordCount+1)-1-leftBit) <= temp(leftBit downto 0);
               
     end ROTW;
  ----------------------------------------------------------------------------
