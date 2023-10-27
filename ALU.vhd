@@ -26,7 +26,7 @@
 
 --    There are 4 different 32 bit sections of the register Rd. 
 --     +127--------96|95---------64|63---------32|31---------0+
---     |       3          2                1              0   |
+--     |       3            2             1            0      |
 --     +------------------------------------------------------+
 
 library IEEE;
@@ -56,7 +56,7 @@ end ALU;
 architecture Behavioral of ALU is
 
 
-----------------------------Saturation Check---------------------------------------
+----------------------------Saturation Check Sub---------------------------------------
 -- Saturation will check if the amount has overflowed. 
 -- neg - neg can't overflow
 -- pos - pos can't overflow
@@ -90,6 +90,161 @@ architecture Behavioral of ALU is
 	    
 	    return result;
 	end function saturationCheckSub;
+-------------------------------------------------------------------------------------
+
+----------------------------Saturation Check Add---------------------------------------
+-- Saturation will check if the amount has overflowed. 
+-- neg + neg May overflow
+-- pos + pos May overflow
+-- neg + pos can't underflow
+-- pos + neg can't overflow 
+-- To check if overflow: if the MSB of the result register (msbRd) is different than the MSB in the register msb2, it has over/underflowed
+-- that is to say (3 bit) 011 - 100 = 101. 0 is in rs2, 1 is the msb of the rd. this has underflowed
+-- (3 bit) 100 - 001 = (1)011. 1 of rd2
+
+--Return 1 if over/underflow
+--Return 0 if all good
+	
+--if (msb2, msbRd) = 10, underflow
+--if (msb2, msbRd) = 01, overflow
+	function saturationCheckAdd(msb1: std_logic_vector(0 downto 0); msb2: std_logic_vector(0 downto 0); msbRd: std_logic_vector(0 downto 0)) return integer is
+    	variable result : integer;
+		begin
+	    -- Check if msb1 is not equal to msb2. If so, then exit with 0: function won't check.
+		--It was impossible to over/underflow
+	    if (msb1 /= msb2) then
+	        result := 0;
+	    else
+	        --Otherwise, check if the signs of msb2 and msbRd match
+			--If they match, then there is no error. 
+			--If they don't match, over/underflow
+			if (msb2 = msbRd) then
+				result := 0;	
+			else
+				result := 1;
+			end if;
+	    end if;
+	    
+	    return result;
+	end function saturationCheckAdd;
+-------------------------------------------------------------------------------------
+
+---000-Signed Integer Multiply-Add Low with Saturation used in R4 instruction Type---
+--The only real time you have to worry about saturation is after the addition/subtraction
+
+	procedure intMulAddLo(signal r1, r2, r3: in std_logic_vector(registerLength-1 downto 0);
+	signal rd: out std_logic_vector(registerLength-1 downto 0)) is
+		variable wordIndex: integer;
+		variable halfWord: integer := 16;
+		variable wordLength: integer := 32;
+		variable MSB, LSB: integer;
+		variable var3: signed (halfWord-1 downto 0);
+		variable var2: signed (halfWord-1 downto 0);
+		variable resultMul: signed (wordLength-1 downto 0);
+		variable resultAdd: signed (wordLength-1 downto 0);
+		begin
+			
+			--0th Bit
+			wordIndex := 0;
+			LSB := registerLength * wordIndex / 4;
+			MSB := (registerLength * wordIndex / 4) + halfWord - 1;
+			
+			var3 := signed( r3( MSB downto LSB ) );
+			var2 := signed( r2( MSB downto LSB ) );
+			resultMul := var3 * var2;
+			
+			resultAdd := resultMul + signed(r1 (MSB + halfWord downto LSB));
+			
+			--Then, we check for saturation
+			if (saturationCheckAdd( std_logic_vector(r1(wordLength-1 downto wordLength-1)), std_logic_vector(resultMul(wordLength-1 downto wordLength-1)), std_logic_vector(resultAdd(wordLength-1 downto wordLength-1)) ) = 1) then
+				--There are two ways to do this. Ultimately, the goal is to replace with 01111111... or 100000... First is to realize that the check of (msb2, msbRd), if different, gives you the
+				--exact order that the over/underflow should be. Can either do directly, or with a reference.
+				--if (msb2, msbRd) = 10, underflow rd <= 100000...
+				--if (msb2, msbRd) = 01, overflow  rd <= 011111...
+				
+					
+				--if (resultMul(wordLength -1) = '0' and resultAdd(wordLength -1) = '1') then
+				--	rd( 62 downto 32) <= (others => '1');
+				--	rd( 63) <= '0';
+				--else
+				--	rd( 62 downto 32) <= (others => '0');
+				--	rd( 63) <= '1';
+				--end if;
+				
+				
+				--Replace the rd with the first bit from resultMul, then the rest from the MSB of resultAdd
+				resultAdd(wordLength-1 downto 0) := (others => resultAdd(wordLength-1));
+				rd(LSB + wordLength-1 downto LSB) <= std_logic_vector(resultMul(wordLength-1 downto wordLength-1)) & std_logic_vector(resultAdd(wordLength - 2 downto 0));
+			else
+				rd( LSB + wordLength-1 downto LSB ) <= std_logic_vector(resultAdd);
+			end if;
+			
+			
+			--1st Bit
+			wordIndex := 1;
+			LSB := registerLength * wordIndex / 4;
+			MSB := (registerLength * wordIndex / 4) + halfWord - 1;
+			
+			var3 := signed( r3( MSB downto LSB ) );
+			var2 := signed( r2( MSB downto LSB ) );
+			resultMul := var3 * var2;
+			
+			resultAdd := resultMul + signed(r1 (MSB + halfWord downto LSB));
+			
+			--Then, we check for saturation
+			if (saturationCheckAdd( std_logic_vector(r1(wordLength-1 downto wordLength-1)), std_logic_vector(resultMul(wordLength-1 downto wordLength-1)), std_logic_vector(resultAdd(wordLength-1 downto wordLength-1)) ) = 1) then				
+				--Replace the rd with the first bit from resultMul, then the rest from the MSB of resultAdd
+				resultAdd(wordLength-1 downto 0) := (others => resultAdd(wordLength-1));
+				rd(LSB + wordLength-1 downto LSB) <= std_logic_vector(resultMul(wordLength-1 downto wordLength-1)) & std_logic_vector(resultAdd(wordLength - 2 downto 0));
+			else
+				rd( LSB + wordLength-1 downto LSB ) <= std_logic_vector(resultAdd);
+			end if;
+			
+			--2nd Bit
+			wordIndex := 2;
+			LSB := registerLength * wordIndex / 4;
+			MSB := (registerLength * wordIndex / 4) + halfWord - 1;
+			
+			var3 := signed( r3( MSB downto LSB ) );
+			var2 := signed( r2( MSB downto LSB ) );
+			resultMul := var3 * var2;
+			
+			resultAdd := resultMul + signed(r1 (MSB + halfWord downto LSB));
+			
+			--Then, we check for saturation
+			if (saturationCheckAdd( std_logic_vector(r1(wordLength-1 downto wordLength-1)), std_logic_vector(resultMul(wordLength-1 downto wordLength-1)), std_logic_vector(resultAdd(wordLength-1 downto wordLength-1)) ) = 1) then				
+				--Replace the rd with the first bit from resultMul, then the rest from the MSB of resultAdd
+				resultAdd(wordLength-1 downto 0) := (others => resultAdd(wordLength-1));
+				rd(LSB + wordLength-1 downto LSB) <= std_logic_vector(resultMul(wordLength-1 downto wordLength-1)) & std_logic_vector(resultAdd(wordLength - 2 downto 0));
+			else
+				rd( LSB + wordLength-1 downto LSB ) <= std_logic_vector(resultAdd);
+			end if;
+			
+			--3rd Bit
+			wordIndex := 3;
+			LSB := registerLength * wordIndex / 4;
+			MSB := (registerLength * wordIndex / 4) + halfWord - 1;
+			
+			var3 := signed( r3( MSB downto LSB ) );
+			var2 := signed( r2( MSB downto LSB ) );
+			resultMul := var3 * var2;
+			
+			resultAdd := resultMul + signed(r1 (MSB + halfWord downto LSB));
+			
+			--Then, we check for saturation
+			if (saturationCheckAdd( std_logic_vector(r1(wordLength-1 downto wordLength-1)), std_logic_vector(resultMul(wordLength-1 downto wordLength-1)), std_logic_vector(resultAdd(wordLength-1 downto wordLength-1)) ) = 1) then				
+				--Replace the rd with the first bit from resultMul, then the rest from the MSB of resultAdd
+				resultAdd(wordLength-1 downto 0) := (others => resultAdd(wordLength-1));
+				rd(LSB + wordLength-1 downto LSB) <= std_logic_vector(resultMul(wordLength-1 downto wordLength-1)) & std_logic_vector(resultAdd(wordLength - 2 downto 0));
+			else
+				rd( LSB + wordLength-1 downto LSB ) <= std_logic_vector(resultAdd);
+			end if;
+			
+			
+			
+			
+			
+	end intMulAddLo;
 -------------------------------------------------------------------------------------
 
 ---0101-Procedure to compute the bitwiseOR used in R3 instruction type---------------
@@ -399,6 +554,8 @@ type r4Format is(intMulAddLo, intMulAddHi, intMulSubLo, intMulSubHi, longMulAddL
       signal r4: r4Format;
 	  
 	  
+	  
+	  
     
       
       
@@ -415,7 +572,7 @@ begin
     begin
 		
 		
-    if (wordIn(23) = '0') then
+    if (wordIn(24) = '0') then
         --If wordIn[24] == 0, then we load Immediate
         
         --Load a 16-bit Immediate value from the [20:5] instruction field into the 16-bit field specified by the Load Index field [23:21] of the 128-bit register rd. 
@@ -436,7 +593,7 @@ begin
     elsif (wordIn(23) = '0') then
     --Otherwise, we're at 10: Instruction is R4 type
         case wordIn(22 downto 20) is
-            when "000" => r4 <= intMulAddLo;
+            when "000" => intMulAddLo(rs1, rs2, rs3, rd);
             when "001" => r4 <= intMulAddHi;
             when "010" => r4 <= intMulSubLo;
             when "011" => r4 <= intMulSubHi;
