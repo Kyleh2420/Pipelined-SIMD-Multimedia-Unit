@@ -233,5 +233,45 @@ begin
 			rs3 <= X"00000FFF000000000000000200000005"; 
 			
 			wait for 10 ns;
+			
+			--Testing for R4 Instruction: intMulSubLo
+			-- wordIn is 1 0 010 00000 00000 00000 00000
+			
+			--0th
+			--Set the 0th set of 32 bits of rs1 to 3  
+			--Set the 0th set of 32 bits of rs2 to 5 
+			--Set the 0th set of 32 bits of rs3 to 5
+			--That is: (5*5) - 3 = 22, which is 0x1_0110
+			
+			--1st
+			--Testing the Underflow portion
+			--Set the 1st set of 32 bits of rs1 to 0x7FFF_FFFF, the highest 32 bit number
+			--Set the 1st set of 16 bits of rs2 to 0x0001, 1 
+			--Set the 1st set of 16 bits of rs3 to 0x8000, The lowest 16 bit number
+			--That is: (-32,768*1) = -32768 - 2,147,483,647 = -2,147,516,415, which underflowed
+			--Therefore, saturation should set it at 0x8000_0000
+			
+			--2nd
+			--Testing the Overflow operation
+			--Set the 1st set of 32 bits of rs1 to 0x8000_0000, the lowest 32 bit number
+			--Set the 1st set of 16 bits of rs2 to 0x7FFF, the highest 16 bit 
+			--Set the 1st set of 16 bits of rs3 to 0x7FFF, the highest 16 bit
+			--That is: (32,767*32,767) = 1,073,676,289 - -2,147,483,648 = 3,221,159,937, which overflowed
+			--Therefore, saturation should set it at 0x7FFF_FFFF
+			
+			--3rd
+			--Testing the Overflow operation
+			--Testing the Overflow operation
+			--Set the 1st set of 32 bits of rs1 to 0x8000_0000, the lowest 32 bit number
+			--Set the 1st set of 16 bits of rs2 to 0x7FFF, the highest 16 bit 
+			--Set the 1st set of 16 bits of rs3 to 0x7FFF, the highest 16 bit
+			--That is: (32,767*32,767) = 1,073,676,289 - -2,147,483,648 = 3,221,159,937, which overflowed
+			--Therefore, saturation should set it at 0x7FFF_FFFF
+			wordIn <= "1001000000000000000000000";
+			rs1 <= X"80000000800000007FFFFFFF00000003";
+			rs2 <= X"00007FFF00007FFF0000000100000005";
+			rs3 <= X"00007FFF00007FFF0000800000000005"; 
+			
+			wait for 10 ns;
         end process;
 end Behavioral;
