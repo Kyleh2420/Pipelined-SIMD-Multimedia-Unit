@@ -55,6 +55,43 @@ end ALU;
 
 architecture Behavioral of ALU is
 
+
+----------------------------Saturation Check---------------------------------------
+-- Saturation will check if the amount has overflowed. 
+-- neg - neg can't overflow
+-- pos - pos can't overflow
+-- neg - pos may underflow
+-- pos - neg may overflow 
+-- To check if overflow: if the MSB of the result register (msbRd) is different than the MSB in the register msb2, it has over/underflowed
+-- that is to say (3 bit) 011 - 100 = 101. 0 is in rs2, 1 is the msb of the rd. this has underflowed
+-- (3 bit) 100 - 001 = (1)011. 1 of rd2
+
+--Return 1 if over/underflow
+--Return 0 if all good
+	
+--if (msb2, msbRd) = 10, underflow
+--if (msb2, msbRd) = 01, overflow
+	function saturationCheckSub(msb1: std_logic_vector(0 downto 0); msb2: std_logic_vector(0 downto 0); msbRd: std_logic_vector(0 downto 0)) return integer is
+    	variable result : integer;
+		begin
+	    -- Check if msb1 is equal to msb2. If so, then exit with 0: function won't check.
+	    if (msb1 = msb2) then
+	        result := 0;
+	    else
+	        --Otherwise, check if the signs of msb2 and msbRd match
+			--If they match, then there is no error. 
+			--If they don't match, over/underflow
+			if (msb2 = msbRd) then
+				result := 0;	
+			else
+				result := 1;
+			end if;
+	    end if;
+	    
+	    return result;
+	end function saturationCheckSub;
+-------------------------------------------------------------------------------------
+
 ---0101-Procedure to compute the bitwiseOR used in R3 instruction type---------------
 
     procedure bitwiseOR(signal r1, r2: in std_logic_vector(registerLength-1 downto 0);
@@ -105,7 +142,9 @@ architecture Behavioral of ALU is
              --
             -- The following indicates the bit to be moved to the 0th index
             --      to_integer(unsigned(rs2(4 downto 0)))-1
-            
+ 		
+			-- I want to use a generate statement for this. What I'm doing doesn't work.
+				
             -- Zeroth word 
 			--Corresponding 5 bits is: 5-0
 			wordIndex := 0;
@@ -186,6 +225,167 @@ architecture Behavioral of ALU is
 		end if;
     end SFWU;
 -----------------------------------------------------------------------------------
+
+
+-----------------------------------------------------------------------------------
+---1111-Procedure to Subtract from halfword saturated used in R3 instruction type-------------
+
+	procedure SFHS(signal r1, r2: in std_logic_vector(registerLength-1 downto 0);
+					signal rd: out std_logic_vector(registerLength-1 downto 0)) is
+		variable wordIndex: integer;
+		variable halfWordCt: integer := 8;
+		variable registerLength: integer := 128;
+		variable wordLength: integer := registerLength / halfWordCt;
+		variable result: signed(wordLength-1 downto 0);
+		variable val2: signed(wordLength-1 downto 0);
+		variable val1: signed(wordLength-1 downto 0);
+		variable LSB: integer;
+		variable MSB: integer;
+	begin
+		--if (saturationCheckSub("1", "0", "1") = 1) then
+		--	  rd <= (others => '1');
+		--else
+		--	rd <= (others => '0');	
+		--end if;
+		
+		
+		-- A generate statement would be better here. However, generate statements dont work inside a procedure.
+		-- If this was in its own entity, it would work just fine.
+		
+		--For the 0th index
+		wordIndex := 0;
+ 		LSB := registerLength * wordIndex / halfWordCt;
+		MSB := LSB + wordLength - 1;
+		
+		val2 := signed ( r2( MSB downto LSB));
+		val1 := signed ( r1( MSB downto LSB));
+		result( wordLength-1 downto 0) := val2 - val1;
+		
+		if (saturationCheckSub( std_logic_vector(val1(wordLength-1 downto wordLength-1)), std_logic_vector(val2(wordLength-1 downto wordLength-1)), std_logic_vector(result(wordLength-1 downto wordLength-1)) ) = 1) then
+			result(wordLength-1 downto 0) := (others => result(wordLength-1));
+			rd(MSB downto LSB) <= val2(wordLength-1) & std_logic_vector(result(wordLength - 2 downto 0));
+		else
+			rd( MSB downto LSB ) <= std_logic_vector(result);
+		end if;
+		
+		
+		--For the 1st index
+		wordIndex := 1;
+ 		LSB := registerLength * wordIndex / halfWordCt;
+		MSB := LSB + wordLength - 1;
+		
+		val2 := signed ( r2( MSB downto LSB));
+		val1 := signed ( r1( MSB downto LSB));
+		result( wordLength-1 downto 0) := val2 - val1;
+		
+		if (saturationCheckSub( std_logic_vector(val1(wordLength-1 downto wordLength-1)), std_logic_vector(val2(wordLength-1 downto wordLength-1)), std_logic_vector(result(wordLength-1 downto wordLength-1)) ) = 1) then
+			result(wordLength-1 downto 0) := (others => result(wordLength-1));
+			rd(MSB downto LSB) <= val2(wordLength-1) & std_logic_vector(result(wordLength - 2 downto 0));
+		else
+			rd( MSB downto LSB ) <= std_logic_vector(result);
+		end if;
+		
+		--For the 2nd index
+		wordIndex := 2;
+ 		LSB := registerLength * wordIndex / halfWordCt;
+		MSB := LSB + wordLength - 1;
+		
+		val2 := signed ( r2( MSB downto LSB));
+		val1 := signed ( r1( MSB downto LSB));
+		result( wordLength-1 downto 0) := val2 - val1;
+		
+		if (saturationCheckSub( std_logic_vector(val1(wordLength-1 downto wordLength-1)), std_logic_vector(val2(wordLength-1 downto wordLength-1)), std_logic_vector(result(wordLength-1 downto wordLength-1)) ) = 1) then
+			result(wordLength-1 downto 0) := (others => result(wordLength-1));
+			rd(MSB downto LSB) <= val2(wordLength-1) & std_logic_vector(result(wordLength - 2 downto 0));
+		else
+			rd( MSB downto LSB ) <= std_logic_vector(result);
+		end if;
+		
+		--For the 3rd index
+		wordIndex := 3;
+ 		LSB := registerLength * wordIndex / halfWordCt;
+		MSB := LSB + wordLength - 1;
+		
+		val2 := signed ( r2( MSB downto LSB));
+		val1 := signed ( r1( MSB downto LSB));
+		result( wordLength-1 downto 0) := val2 - val1;
+		
+		if (saturationCheckSub( std_logic_vector(val1(wordLength-1 downto wordLength-1)), std_logic_vector(val2(wordLength-1 downto wordLength-1)), std_logic_vector(result(wordLength-1 downto wordLength-1)) ) = 1) then
+			result(wordLength-1 downto 0) := (others => result(wordLength-1));
+			rd(MSB downto LSB) <= val2(wordLength-1) & std_logic_vector(result(wordLength - 2 downto 0));
+		else
+			rd( MSB downto LSB ) <= std_logic_vector(result);
+		end if;
+		
+		--For the 4th index
+		wordIndex := 4;
+ 		LSB := registerLength * wordIndex / halfWordCt;
+		MSB := LSB + wordLength - 1;
+		
+		val2 := signed ( r2( MSB downto LSB));
+		val1 := signed ( r1( MSB downto LSB));
+		result( wordLength-1 downto 0) := val2 - val1;
+		
+		if (saturationCheckSub( std_logic_vector(val1(wordLength-1 downto wordLength-1)), std_logic_vector(val2(wordLength-1 downto wordLength-1)), std_logic_vector(result(wordLength-1 downto wordLength-1)) ) = 1) then
+			result(wordLength-1 downto 0) := (others => result(wordLength-1));
+			rd(MSB downto LSB) <= val2(wordLength-1) & std_logic_vector(result(wordLength - 2 downto 0));
+		else
+			rd( MSB downto LSB ) <= std_logic_vector(result);
+		end if;
+		
+		--For the 5th index
+		wordIndex := 5;
+ 		LSB := registerLength * wordIndex / halfWordCt;
+		MSB := LSB + wordLength - 1;
+		
+		val2 := signed ( r2( MSB downto LSB));
+		val1 := signed ( r1( MSB downto LSB));
+		result( wordLength-1 downto 0) := val2 - val1;
+		
+		if (saturationCheckSub( std_logic_vector(val1(wordLength-1 downto wordLength-1)), std_logic_vector(val2(wordLength-1 downto wordLength-1)), std_logic_vector(result(wordLength-1 downto wordLength-1)) ) = 1) then
+			result(wordLength-1 downto 0) := (others => result(wordLength-1));
+			rd(MSB downto LSB) <= val2(wordLength-1) & std_logic_vector(result(wordLength - 2 downto 0));
+		else
+			rd( MSB downto LSB ) <= std_logic_vector(result);
+		end if;
+		
+		--For the 6th index
+		wordIndex := 6;
+ 		LSB := registerLength * wordIndex / halfWordCt;
+		MSB := LSB + wordLength - 1;
+		
+		val2 := signed ( r2( MSB downto LSB));
+		val1 := signed ( r1( MSB downto LSB));
+		result( wordLength-1 downto 0) := val2 - val1;
+		
+		if (saturationCheckSub( std_logic_vector(val1(wordLength-1 downto wordLength-1)), std_logic_vector(val2(wordLength-1 downto wordLength-1)), std_logic_vector(result(wordLength-1 downto wordLength-1)) ) = 1) then
+			result(wordLength-1 downto 0) := (others => result(wordLength-1));
+			rd(MSB downto LSB) <= val2(wordLength-1) & std_logic_vector(result(wordLength - 2 downto 0));
+		else
+			rd( MSB downto LSB ) <= std_logic_vector(result);
+		end if;
+		
+		--For the 7th index
+		wordIndex := 7;
+ 		LSB := registerLength * wordIndex / halfWordCt;
+		MSB := LSB + wordLength - 1;
+		
+		val2 := signed ( r2( MSB downto LSB));
+		val1 := signed ( r1( MSB downto LSB));
+		result( wordLength-1 downto 0) := val2 - val1;
+		
+		if (saturationCheckSub( std_logic_vector(val1(wordLength-1 downto wordLength-1)), std_logic_vector(val2(wordLength-1 downto wordLength-1)), std_logic_vector(result(wordLength-1 downto wordLength-1)) ) = 1) then
+			result(wordLength-1 downto 0) := (others => result(wordLength-1));
+			rd(MSB downto LSB) <= val2(wordLength-1) & std_logic_vector(result(wordLength - 2 downto 0));
+		else
+			rd( MSB downto LSB ) <= std_logic_vector(result);
+		end if;
+		
+
+    end SFHS;
+-----------------------------------------------------------------------------------
+
+
  
  
  
@@ -203,6 +403,7 @@ type r4Format is(intMulAddLo, intMulAddHi, intMulSubLo, intMulSubHi, longMulAddL
       
       
 begin
+	
     ALUProcess: process (all)
     	   -- For Load Immediate
     variable loadIndex: integer;
@@ -211,7 +412,8 @@ begin
     variable temp: std_logic_vector(127 downto 0);
     variable intTemp: integer;
     
-    begin				
+    begin
+		
 		
     if (wordIn(23) = '0') then
         --If wordIn[24] == 0, then we load Immediate
@@ -265,7 +467,7 @@ begin
             when "1100" => INVB(rs1, rs2, rd);
             when "1101" => ROTW(rs1, rs2, rd);
             when "1110" => SFWU(rs1, rs2, rd);
-            when "1111" => selectOpcode <= SFHS;
+            when "1111" => SFHS(rs1, rs2, rd);
             when others => selectOpcode <= NUL;
         end case;
         

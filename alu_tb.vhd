@@ -157,6 +157,45 @@ begin
 			wait for 10 ns;
 			
 			
+			--Testing for SFHS
+			-- wordIn is 1 1 0000 1111 00000 00000 00000
+			
+			--0th
+			--Underflow Condition
+			--Set zeroth set of rs2 to 0x8000, which is most negative number
+			--Set zeroth set of rs1 to 0x0001, which is 1
+			--Answer should be placed in zeroth 16 bits of rd
+			--Answer should underflow - you can't get any more negative
+			--Saturation will kick in, answer is 0x8000
+			
+			--1st
+			--Regular Operation
+			--Set last set of rs2 to 0x8000, which is most negative number
+			--Set last set of rs1 to 0x8000, which is most negative number
+			--Answer should be placed in 1st 16 bits of rd
+			--Answer should 0x0000
+			
+			--2nd
+			--Overflow Condition
+			--Set 2nd set of rs2 to 0x7FFF, which is most postive number
+			--Set 2nd set of rs1 to 0x8000, which is most negative number
+			--Answer should be placed in last 16 bits of rd
+			--Answer should overflow - you can't get anymore positive
+			--Saturation will kick in, answer is 0x7FFF
+			
+			--3rd
+			--Normal Operation
+			--Set 3rd set of rs2 to 0x0005, which is dec 5
+			--Set 3rd set of rs1 to 0x0007, which is dec 7
+			--Answer should be placed in last 16 bits of rd
+			--Answer is -2, which is FFFE
+			
+			wordIn <= "1100001111000000000000000";
+			rs1 <= X"00078000800000010007800080000001";
+			rs2 <= X"00057FFF8000800000057FFF80008000"; 
+			
+			wait for 10 ns;
+						
                     
         end process;
 end Behavioral;
