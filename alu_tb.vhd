@@ -321,5 +321,55 @@ begin
 			rs3 <= X"000000007FFFFFFF000000007FFFFFFF"; 
 			
 			wait for 10 ns;
+			
+			--Testing for R4 Instruction: longMulAddLo
+			-- wordIn is 1 0 110 00000 00000 00000 00000
+			
+			--OVERFLOW AND UNDERFLOW OF THIS NEEDS TO BE DONE
+			
+			--0th
+			--Overflow Operation
+			--Set the 0th set of 64 bits of rs1 to 0x7FFF_FFFF_FFFF_FFFF, the highest 64 bit number 
+			--Set the 0th set of 32 bits of rs2 to 0x7FFF_FFFF 
+			--Set the 0th set of 32 bits of rs3 to 0x7FFF_FFFF
+			--This should cap out at 0x7FFF_FFFF_FFFF_FFFF
+			
+			--1st
+			--Testing the Underflow portion
+			--Set the 1st set of 32 bits of rs1 to 0x8000_0000_0000_0000, the lowest 64 bit number
+			--Set the 1st set of 16 bits of rs2 to 0x8000_0000, The lowest 32 bit number
+			--Set the 1st set of 16 bits of rs3 to 0x7FFF_FFFF, The highest 32 bit number
+			--This should saturate at 0x8000_0000_0000_0000
+			wordIn <= "1011000000000000000000000";
+			rs1 <= X"80000000000000007FFFFFFFFFFFFFFF";
+			rs2 <= X"0000000080000000000000007FFFFFFF";
+			rs3 <= X"000000007FFFFFFF000000007FFFFFFF"; 
+			
+			wait for 10 ns;
+			
+			--Testing for R4 Instruction: longMulAddLo
+			-- wordIn is 1 0 110 00000 00000 00000 00000
+			
+			--0th
+			--Normal Operation
+			--Set the 1st set of 64 bits of rs1 to 0x0000_0000_000F_4240, the lowest 64 bit number
+			--Set the 1st set of 32 bits of rs2 to 0x7FFF_FFFF, The highest 32 bit number
+			--Set the 1st set of 32 bits of rs3 to 0x7FFF_FFFF, The highest 32 bit number
+			--That is: (2147483647 * 2147483647) + 1000000 = 4,611,686,014,131,420,609
+			--Expect: 3FFFFFFEFFF0BDC1
+			
+			--1st
+			--Normal Operation
+			--Set the 1st set of 64 bits of rs1 to 0x0000_0000_000F_4240, the lowest 64 bit number
+			--Set the 1st set of 32 bits of rs2 to 0x7FFF_FFFF, The highest 32 bit number
+			--Set the 1st set of 32 bits of rs3 to 0x7FFF_FFFF, The highest 32 bit number
+			--That is: (2147483647 * 2147483647) - 1000000 = 4,611,686,014,133,420,609
+			--Expect: 3FFFFFFF000F4241
+			wordIn <= "1011000000000000000000000";
+			rs1 <= X"00000000000F424000000000000F4240";
+			rs2 <= X"000000007FFFFFFF000000007FFFFFFF";
+			rs3 <= X"000000007FFFFFFF000000007FFFFFFF"; 
+			
+			wait for 10 ns;
         end process;
 end Behavioral;
