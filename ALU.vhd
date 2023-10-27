@@ -370,14 +370,14 @@ architecture Behavioral of ALU is
 	end intMulSubLo;
 -------------------------------------------------------------------------------------
 
----000-Signed Integer Multiply-Add Low with Saturation used in R4 instruction Type---
+---100-Signed Long Multiply-Add Low with Saturation used in R4 instruction Type---
 --The only real time you have to worry about saturation is after the addition/subtraction
 
-	procedure intMulAddLo(signal r1, r2, r3: in std_logic_vector(registerLength-1 downto 0);
+	procedure longMulAddLo(signal r1, r2, r3: in std_logic_vector(registerLength-1 downto 0);
 	signal rd: out std_logic_vector(registerLength-1 downto 0)) is
 		variable wordIndex: integer;
-		variable halfWord: integer := 16;
-		variable wordLength: integer := 32;
+		variable halfWord: integer := 32;
+		variable wordLength: integer := 64;
 		variable MSB, LSB: integer;
 		variable var3: signed (halfWord-1 downto 0);
 		variable var2: signed (halfWord-1 downto 0);
@@ -387,8 +387,8 @@ architecture Behavioral of ALU is
 			
 			--0th Bit
 			wordIndex := 0;
-			LSB := registerLength * wordIndex / 4;
-			MSB := (registerLength * wordIndex / 4) + halfWord - 1;
+			LSB := registerLength * wordIndex / 2;
+			MSB := (registerLength * wordIndex / 2) + halfWord - 1;
 			
 			var3 := signed( r3( MSB downto LSB ) );
 			var2 := signed( r2( MSB downto LSB ) );
@@ -423,14 +423,15 @@ architecture Behavioral of ALU is
 			
 			--1st Bit
 			wordIndex := 1;
-			LSB := registerLength * wordIndex / 4;
-			MSB := (registerLength * wordIndex / 4) + halfWord - 1;
+			LSB := registerLength * wordIndex / 2;
+			MSB := (registerLength * wordIndex / 2) + halfWord - 1;
 			
 			var3 := signed( r3( MSB downto LSB ) );
 			var2 := signed( r2( MSB downto LSB ) );
 			resultMul := var3 * var2;
 			
 			resultAdd := resultMul + signed(r1 (MSB + halfWord downto LSB));
+			--resultAdd := resultMul;
 			
 			--Then, we check for saturation
 			if (saturationCheckAdd( std_logic_vector(r1(((wordIndex+1) * wordLength)-1 downto ((wordIndex+1) * wordLength)-1)), std_logic_vector(resultMul(wordLength-1 downto wordLength-1)), std_logic_vector(resultAdd(wordLength-1 downto wordLength-1)) ) = 1) then				
@@ -440,53 +441,9 @@ architecture Behavioral of ALU is
 			else
 				rd( LSB + wordLength-1 downto LSB ) <= std_logic_vector(resultAdd);
 			end if;
+	
 			
-			--2nd Bit
-			wordIndex := 2;
-			LSB := registerLength * wordIndex / 4;
-			MSB := (registerLength * wordIndex / 4) + halfWord - 1;
-			
-			var3 := signed( r3( MSB downto LSB ) );
-			var2 := signed( r2( MSB downto LSB ) );
-			resultMul := var3 * var2;
-			
-			resultAdd := resultMul + signed(r1 (MSB + halfWord downto LSB));
-			
-			
-			--Then, we check for saturation
-			if (saturationCheckAdd( std_logic_vector(r1(((wordIndex+1) * wordLength)-1 downto ((wordIndex+1) * wordLength)-1)), std_logic_vector(resultMul(wordLength-1 downto wordLength-1)), std_logic_vector(resultAdd(wordLength-1 downto wordLength-1)) ) = 1) then				
-				--Replace the rd with the first bit from resultMul, then the rest from the MSB of resultAdd
-				resultAdd(wordLength-1 downto 0) := (others => resultAdd(wordLength-1));
-				rd(LSB + wordLength-1 downto LSB) <= std_logic_vector(resultMul(wordLength-1 downto wordLength-1)) & std_logic_vector(resultAdd(wordLength - 2 downto 0));
-			else
-				rd( LSB + wordLength-1 downto LSB ) <= std_logic_vector(resultAdd);
-			end if;
-			
-			--3rd Bit
-			wordIndex := 3;
-			LSB := registerLength * wordIndex / 4;
-			MSB := (registerLength * wordIndex / 4) + halfWord - 1;
-			
-			var3 := signed( r3( MSB downto LSB ) );
-			var2 := signed( r2( MSB downto LSB ) );
-			resultMul := var3 * var2;
-			
-			resultAdd := resultMul + signed(r1 (MSB + halfWord downto LSB));
-			
-			--Then, we check for saturation
-			if (saturationCheckAdd( std_logic_vector(r1(((wordIndex+1) * wordLength)-1 downto ((wordIndex+1) * wordLength)-1)), std_logic_vector(resultMul(wordLength-1 downto wordLength-1)), std_logic_vector(resultAdd(wordLength-1 downto wordLength-1)) ) = 1) then				
-				--Replace the rd with the first bit from resultMul, then the rest from the MSB of resultAdd
-				resultAdd(wordLength-1 downto 0) := (others => resultAdd(wordLength-1));
-				rd(LSB + wordLength-1 downto LSB) <= std_logic_vector(resultMul(wordLength-1 downto wordLength-1)) & std_logic_vector(resultAdd(wordLength - 2 downto 0));
-			else
-				rd( LSB + wordLength-1 downto LSB ) <= std_logic_vector(resultAdd);
-			end if;
-			
-			
-			
-			
-			
-	end intMulAddLo;
+	end longMulAddLo;
 -------------------------------------------------------------------------------------
 
 ---0101-Procedure to compute the bitwiseOR used in R3 instruction type---------------
@@ -839,7 +796,7 @@ begin
             when "001" => r4 <= intMulAddHi;
             when "010" => intMulSubLo(rs1, rs2, rs3, rd);
             when "011" => r4 <= intMulSubHi;
-            when "100" => r4 <= longMulAddLo;
+            when "100" => longMulAddLo(rs1, rs2, rs3, rd);
             when "101" => r4 <= longMulAddHi;
             when "110" => r4 <= longMulSubLo;
             when "111" => r4 <= longMulSubHi;
