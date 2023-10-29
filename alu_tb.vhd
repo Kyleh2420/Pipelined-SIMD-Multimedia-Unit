@@ -322,7 +322,7 @@ begin
 			
 			wait for 10 ns;
 			
-			--Testing for R4 Instruction: longMulAddLo
+			--Testing for R4 Instruction: longMulSubLo
 			-- wordIn is 1 0 110 00000 00000 00000 00000
 			
 			--OVERFLOW AND UNDERFLOW OF THIS NEEDS TO BE DONE
@@ -347,7 +347,7 @@ begin
 			
 			wait for 10 ns;
 			
-			--Testing for R4 Instruction: longMulAddLo
+			--Testing for R4 Instruction: longMulSubLo
 			-- wordIn is 1 0 110 00000 00000 00000 00000
 			
 			--0th
@@ -369,6 +369,83 @@ begin
 			rs1 <= X"00000000000F424000000000000F4240";
 			rs2 <= X"000000007FFFFFFF000000007FFFFFFF";
 			rs3 <= X"000000007FFFFFFF000000007FFFFFFF"; 
+			
+			wait for 10 ns;
+			
+			--Testing for R4 Instruction: intMulAddHi
+			-- wordIn is 1 0 001 00000 00000 00000 00000
+			
+			--0th
+			--Set the 0th set of 32 bits of rs1 to 3  
+			--Set the 0th set of 32 bits of rs2 to 5 
+			--Set the 0th set of 32 bits of rs3 to 5
+			--That is: (5*5) + 3 = 28, which is 0x0_001C
+			
+			--1st
+			--Testing the overflow portion
+			--Set the 1st set of 32 bits of rs1 to 0x7FFF_FFFC, the hightest 32 bit number - 3
+			--Set the 1st set of 16 bits of rs2 to 0x7FFF, the highest 16 bit 
+			--Set the 1st set of 16 bits of rs3 to 0x0002, 2
+			--That is: (32,767*2) = 65,534 + 4,294,967,296 = 4,295,032,830, which overflowed
+			--Therefore, saturation should set it at 0x7FFF_FFFF
+			
+			--2nd
+			--Testing the normal operation
+			--Set the 1st set of 32 bits of rs1 to 0x1000_0000, the lowest 32 bit number
+			--Set the 1st set of 16 bits of rs2 to 0x0000, 0 
+			--Set the 1st set of 16 bits of rs3 to 0x0000, 0
+			--That is: (0*0) = 0 - 4,294,967,296 = -4,294,967,296, or 0x1000_0000
+			
+			--3rd
+			--Testing the normal operation
+			--Set the 1st set of 32 bits of rs1 to 0x7FFF_FFFF, the highest 32 bit number
+			--Set the 1st set of 16 bits of rs2 to 0x8000, The lowest 16 bit number 
+			--Set the 1st set of 16 bits of rs3 to 0x7FFF, The Highest 16 bit number
+			--That is: (32,767*-32,767) = -1,073,676,289 + 4,294,967,296 = ______
+			wordIn <= "1000100000000000000000000";
+			rs1 <= X"7FFFFFFF100000007FFFFFFC00000003";
+			rs2 <= X"80000000000000007FFF000000050000";
+			rs3 <= X"FFFF0000000000000002000000050000"; 
+			
+			wait for 10 ns;
+			
+			--Testing for R4 Instruction: intMulSubHi
+			-- wordIn is 1 0 011 00000 00000 00000 00000
+			
+			--0th
+			--Set the 0th set of 32 bits of rs1 to 3  
+			--Set the 0th set of 32 bits of rs2 to 5 
+			--Set the 0th set of 32 bits of rs3 to 5
+			--That is: (5*5) - 3 = 22, which is 0x0000_0016
+			
+			--1st
+			--Testing the Underflow portion
+			--Set the 1st set of 32 bits of rs1 to 0x7FFF_FFFF, the highest 32 bit number
+			--Set the 1st set of 16 bits of rs2 to 0x0001, 1 
+			--Set the 1st set of 16 bits of rs3 to 0x8000, The lowest 16 bit number
+			--That is: (-32,768*1) = -32768 - 2,147,483,647 = -2,147,516,415, which underflowed
+			--Therefore, saturation should set it at 0x8000_0000
+			
+			--2nd
+			--Testing the Overflow operation
+			--Set the 1st set of 32 bits of rs1 to 0x8000_0000, the lowest 32 bit number
+			--Set the 1st set of 16 bits of rs2 to 0x7FFF, the highest 16 bit 
+			--Set the 1st set of 16 bits of rs3 to 0x7FFF, the highest 16 bit
+			--That is: (32,767*32,767) = 1,073,676,289 - -2,147,483,648 = 3,221,159,937, which overflowed
+			--Therefore, saturation should set it at 0x7FFF_FFFF
+			
+			--3rd
+			--Testing the Overflow operation
+			--Testing the Overflow operation
+			--Set the 1st set of 32 bits of rs1 to 0x8000_0000, the lowest 32 bit number
+			--Set the 1st set of 16 bits of rs2 to 0x7FFF, the highest 16 bit 
+			--Set the 1st set of 16 bits of rs3 to 0x7FFF, the highest 16 bit
+			--That is: (32,767*32,767) = 1,073,676,289 - -2,147,483,648 = 3,221,159,937, which overflowed
+			--Therefore, saturation should set it at 0x7FFF_FFFF
+			wordIn <= "1001100000000000000000000";
+			rs1 <= X"80000000800000007FFFFFFF00000003";
+			rs2 <= X"7FFF00007FFF00000001000000050000";
+			rs3 <= X"7FFF00007FFF00008000000000050000"; 
 			
 			wait for 10 ns;
         end process;

@@ -248,6 +248,125 @@ architecture Behavioral of ALU is
 	end intMulAddLo;
 -------------------------------------------------------------------------------------
 
+---001-Signed Integer Multiply-Add High with Saturation used in R4 instruction Type---
+--The only real time you have to worry about saturation is after the addition/subtraction
+
+	procedure intMulAddHi(signal r1, r2, r3: in std_logic_vector(registerLength-1 downto 0);
+	signal rd: out std_logic_vector(registerLength-1 downto 0)) is
+		variable wordIndex: integer;
+		variable halfWord: integer := 16;
+		variable wordLength: integer := 32;
+		variable MSB, LSB: integer;
+		variable var3: signed (halfWord-1 downto 0);
+		variable var2: signed (halfWord-1 downto 0);
+		variable resultMul: signed (wordLength-1 downto 0);
+		variable resultAdd: signed (wordLength-1 downto 0);
+		begin
+			
+			--0th Bit
+			wordIndex := 0;
+			LSB := (registerLength * wordIndex / 4)+16;
+			MSB := ((registerLength * wordIndex / 4) + halfWord - 1)+16;
+			
+			var3 := signed( r3( MSB downto LSB ) );
+			var2 := signed( r2( MSB downto LSB ) );
+			resultMul := var3 * var2;
+			
+			resultAdd := resultMul + signed(r1 (MSB downto LSB - halfWord));
+			--resultAdd := resultMul;
+			--Then, we check for saturation
+			if (saturationCheckAdd( std_logic_vector(r1(((wordIndex+1) * wordLength)-1 downto ((wordIndex+1) * wordLength)-1)), std_logic_vector(resultMul(wordLength-1 downto wordLength-1)), std_logic_vector(resultAdd(wordLength-1 downto wordLength-1)) ) = 1) then
+				--There are two ways to do this. Ultimately, the goal is to replace with 01111111... or 100000... First is to realize that the check of (msb2, msbRd), if different, gives you the
+				--exact order that the over/underflow should be. Can either do directly, or with a reference.
+				--if (msb2, msbRd) = 10, underflow rd <= 100000...
+				--if (msb2, msbRd) = 01, overflow  rd <= 011111...
+				
+					
+				--if (resultMul(wordLength -1) = '0' and resultAdd(wordLength -1) = '1') then
+				--	rd( 62 downto 32) <= (others => '1');
+				--	rd( 63) <= '0';
+				--else
+				--	rd( 62 downto 32) <= (others => '0');
+				--	rd( 63) <= '1';
+				--end if;
+				
+				
+				--Replace the rd with the first bit from resultMul, then the rest from the MSB of resultAdd
+				resultAdd(wordLength-1 downto 0) := (others => resultAdd(wordLength-1));
+				rd(MSB downto LSB - halfWord) <= std_logic_vector(resultMul(wordLength-1 downto wordLength-1)) & std_logic_vector(resultAdd(wordLength - 2 downto 0));
+			else
+				rd( MSB downto MSB - wordLength+1) <= std_logic_vector(resultAdd);
+			end if;
+			
+			
+			--1st Bit
+			wordIndex := 1;
+			LSB := (registerLength * wordIndex / 4)+16;
+			MSB := ((registerLength * wordIndex / 4) + halfWord - 1)+16;
+			
+			var3 := signed( r3( MSB downto LSB ) );
+			var2 := signed( r2( MSB downto LSB ) );
+			resultMul := var3 * var2;
+			
+			resultAdd := resultMul + signed(r1 (MSB downto LSB - halfWord));
+			
+			--Then, we check for saturation
+			if (saturationCheckAdd( std_logic_vector(r1(((wordIndex+1) * wordLength)-1 downto ((wordIndex+1) * wordLength)-1)), std_logic_vector(resultMul(wordLength-1 downto wordLength-1)), std_logic_vector(resultAdd(wordLength-1 downto wordLength-1)) ) = 1) then				
+				--Replace the rd with the first bit from resultMul, then the rest from the MSB of resultAdd
+				resultAdd(wordLength-1 downto 0) := (others => resultAdd(wordLength-1));
+				rd( MSB downto LSB - halfWord) <= std_logic_vector(resultMul(wordLength-1 downto wordLength-1)) & std_logic_vector(resultAdd(wordLength - 2 downto 0));
+			else
+				rd( MSB downto MSB - wordLength+1) <= std_logic_vector(resultAdd);
+			end if;
+			
+			--2nd Bit
+			wordIndex := 2;
+			LSB := (registerLength * wordIndex / 4)+16;
+			MSB := ((registerLength * wordIndex / 4) + halfWord - 1)+16;
+			
+			var3 := signed( r3( MSB downto LSB ) );
+			var2 := signed( r2( MSB downto LSB ) );
+			resultMul := var3 * var2;
+			
+			resultAdd := resultMul + signed(r1 (MSB downto LSB - halfWord));
+			
+			
+			--Then, we check for saturation
+			if (saturationCheckAdd( std_logic_vector(r1(((wordIndex+1) * wordLength)-1 downto ((wordIndex+1) * wordLength)-1)), std_logic_vector(resultMul(wordLength-1 downto wordLength-1)), std_logic_vector(resultAdd(wordLength-1 downto wordLength-1)) ) = 1) then				
+				--Replace the rd with the first bit from resultMul, then the rest from the MSB of resultAdd
+				resultAdd(wordLength-1 downto 0) := (others => resultAdd(wordLength-1));
+				rd( MSB downto LSB - halfWord) <= std_logic_vector(resultMul(wordLength-1 downto wordLength-1)) & std_logic_vector(resultAdd(wordLength - 2 downto 0));
+			else
+				rd( MSB downto MSB - wordLength+1) <= std_logic_vector(resultAdd);
+			end if;
+			
+			--3rd Bit
+			wordIndex := 3;
+			LSB := (registerLength * wordIndex / 4)+16;
+			MSB := ((registerLength * wordIndex / 4) + halfWord - 1)+16;
+			
+			var3 := signed( r3( MSB downto LSB ) );
+			var2 := signed( r2( MSB downto LSB ) );
+			resultMul := var3 * var2;
+			
+			resultAdd := resultMul + signed(r1 (MSB downto LSB - halfWord));
+			
+			--Then, we check for saturation
+			if (saturationCheckAdd( std_logic_vector(r1(((wordIndex+1) * wordLength)-1 downto ((wordIndex+1) * wordLength)-1)), std_logic_vector(resultMul(wordLength-1 downto wordLength-1)), std_logic_vector(resultAdd(wordLength-1 downto wordLength-1)) ) = 1) then				
+				--Replace the rd with the first bit from resultMul, then the rest from the MSB of resultAdd
+				resultAdd(wordLength-1 downto 0) := (others => resultAdd(wordLength-1));
+				rd(MSB downto LSB - halfWord) <= std_logic_vector(resultMul(wordLength-1 downto wordLength-1)) & std_logic_vector(resultAdd(wordLength - 2 downto 0));
+			else
+				rd( MSB downto MSB - wordLength+1) <= std_logic_vector(resultAdd);
+			end if;
+			
+			
+			
+			
+			
+	end intMulAddHi;
+-------------------------------------------------------------------------------------
+
 
 ---010-Signed Integer Multiply-Sub Low with Saturation used in R4 instruction Type---
 --The only real time you have to worry about saturation is after the addition/subtraction
@@ -369,11 +488,204 @@ architecture Behavioral of ALU is
 			
 	end intMulSubLo;
 -------------------------------------------------------------------------------------
+---011-Signed Integer Multiply-Sub High with Saturation used in R4 instruction Type---
+--The only real time you have to worry about saturation is after the addition/subtraction
 
+	procedure intMulSubHi(signal r1, r2, r3: in std_logic_vector(registerLength-1 downto 0);
+	signal rd: out std_logic_vector(registerLength-1 downto 0)) is
+		variable wordIndex: integer;
+		variable halfWord: integer := 16;
+		variable wordLength: integer := 32;
+		variable MSB, LSB: integer;
+		variable var3: signed (halfWord-1 downto 0);
+		variable var2: signed (halfWord-1 downto 0);
+		variable resultMul: signed (wordLength-1 downto 0);
+		variable resultAdd: signed (wordLength-1 downto 0);
+		begin
+			
+			--0th Bit
+			wordIndex := 0;
+			LSB := (registerLength * wordIndex / 4)+16;
+			MSB := ((registerLength * wordIndex / 4) + halfWord - 1)+16;
+			
+			var3 := signed( r3( MSB downto LSB ) );
+			var2 := signed( r2( MSB downto LSB ) );
+			resultMul := var3 * var2;
+			
+			resultAdd := resultMul - signed(r1 (MSB downto LSB - halfWord));
+			--resultAdd := resultMul;
+			--Then, we check for saturation
+			if (saturationCheckSub( std_logic_vector(r1(((wordIndex+1) * wordLength)-1 downto ((wordIndex+1) * wordLength)-1)), std_logic_vector(resultMul(wordLength-1 downto wordLength-1)), std_logic_vector(resultAdd(wordLength-1 downto wordLength-1)) ) = 1) then
+				--There are two ways to do this. Ultimately, the goal is to replace with 01111111... or 100000... First is to realize that the check of (msb2, msbRd), if different, gives you the
+				--exact order that the over/underflow should be. Can either do directly, or with a reference.
+				--if (msb2, msbRd) = 10, underflow rd <= 100000...
+				--if (msb2, msbRd) = 01, overflow  rd <= 011111...
+				
+					
+				--if (resultMul(wordLength -1) = '0' and resultAdd(wordLength -1) = '1') then
+				--	rd( 62 downto 32) <= (others => '1');
+				--	rd( 63) <= '0';
+				--else
+				--	rd( 62 downto 32) <= (others => '0');
+				--	rd( 63) <= '1';
+				--end if;
+				
+				
+				--Replace the rd with the first bit from resultMul, then the rest from the MSB of resultAdd
+				resultAdd(wordLength-1 downto 0) := (others => resultAdd(wordLength-1));
+				rd(MSB downto LSB - halfWord) <= std_logic_vector(resultMul(wordLength-1 downto wordLength-1)) & std_logic_vector(resultAdd(wordLength - 2 downto 0));
+			else
+				rd( MSB downto MSB - wordLength+1) <= std_logic_vector(resultAdd);
+			end if;
+			
+			
+			--1st Bit
+			wordIndex := 1;
+			LSB := (registerLength * wordIndex / 4)+16;
+			MSB := ((registerLength * wordIndex / 4) + halfWord - 1)+16;
+			
+			var3 := signed( r3( MSB downto LSB ) );
+			var2 := signed( r2( MSB downto LSB ) );
+			resultMul := var3 * var2;
+			
+			resultAdd := resultMul - signed(r1 (MSB downto LSB - halfWord));
+			
+			--Then, we check for saturation
+			if (saturationCheckSub( std_logic_vector(r1(((wordIndex+1) * wordLength)-1 downto ((wordIndex+1) * wordLength)-1)), std_logic_vector(resultMul(wordLength-1 downto wordLength-1)), std_logic_vector(resultAdd(wordLength-1 downto wordLength-1)) ) = 1) then				
+				--Replace the rd with the first bit from resultMul, then the rest from the MSB of resultAdd
+				resultAdd(wordLength-1 downto 0) := (others => resultAdd(wordLength-1));
+				rd( MSB downto LSB - halfWord) <= std_logic_vector(resultMul(wordLength-1 downto wordLength-1)) & std_logic_vector(resultAdd(wordLength - 2 downto 0));
+			else
+				rd( MSB downto MSB - wordLength+1) <= std_logic_vector(resultAdd);
+			end if;
+			
+			--2nd Bit
+			wordIndex := 2;
+			LSB := (registerLength * wordIndex / 4)+16;
+			MSB := ((registerLength * wordIndex / 4) + halfWord - 1)+16;
+			
+			var3 := signed( r3( MSB downto LSB ) );
+			var2 := signed( r2( MSB downto LSB ) );
+			resultMul := var3 * var2;
+			
+			resultAdd := resultMul - signed(r1 (MSB downto LSB - halfWord));
+			
+			
+			--Then, we check for saturation
+			if (saturationCheckSub( std_logic_vector(r1(((wordIndex+1) * wordLength)-1 downto ((wordIndex+1) * wordLength)-1)), std_logic_vector(resultMul(wordLength-1 downto wordLength-1)), std_logic_vector(resultAdd(wordLength-1 downto wordLength-1)) ) = 1) then				
+				--Replace the rd with the first bit from resultMul, then the rest from the MSB of resultAdd
+				resultAdd(wordLength-1 downto 0) := (others => resultAdd(wordLength-1));
+				rd( MSB downto LSB - halfWord) <= std_logic_vector(resultMul(wordLength-1 downto wordLength-1)) & std_logic_vector(resultAdd(wordLength - 2 downto 0));
+			else
+				rd( MSB downto MSB - wordLength+1) <= std_logic_vector(resultAdd);
+			end if;
+			
+			--3rd Bit
+			wordIndex := 3;
+			LSB := (registerLength * wordIndex / 4)+16;
+			MSB := ((registerLength * wordIndex / 4) + halfWord - 1)+16;
+			
+			var3 := signed( r3( MSB downto LSB ) );
+			var2 := signed( r2( MSB downto LSB ) );
+			resultMul := var3 * var2;
+			
+			resultAdd := resultMul - signed(r1 (MSB downto LSB - halfWord));
+			
+			--Then, we check for saturation
+			if (saturationCheckSub( std_logic_vector(r1(((wordIndex+1) * wordLength)-1 downto ((wordIndex+1) * wordLength)-1)), std_logic_vector(resultMul(wordLength-1 downto wordLength-1)), std_logic_vector(resultAdd(wordLength-1 downto wordLength-1)) ) = 1) then				
+				--Replace the rd with the first bit from resultMul, then the rest from the MSB of resultAdd
+				resultAdd(wordLength-1 downto 0) := (others => resultAdd(wordLength-1));
+				rd(MSB downto LSB - halfWord) <= std_logic_vector(resultMul(wordLength-1 downto wordLength-1)) & std_logic_vector(resultAdd(wordLength - 2 downto 0));
+			else
+				rd( MSB downto MSB - wordLength+1) <= std_logic_vector(resultAdd);
+			end if;
+			
+			
+			
+			
+			
+	end intMulSubHi;
+-------------------------------------------------------------------------------------
 ---100-Signed Long Multiply-Add Low with Saturation used in R4 instruction Type---
 --The only real time you have to worry about saturation is after the addition/subtraction
 
 	procedure longMulAddLo(signal r1, r2, r3: in std_logic_vector(registerLength-1 downto 0);
+	signal rd: out std_logic_vector(registerLength-1 downto 0)) is
+		variable wordIndex: integer;
+		variable halfWord: integer := 32;
+		variable wordLength: integer := 64;
+		variable MSB, LSB: integer;
+		variable var3: signed (halfWord-1 downto 0);
+		variable var2: signed (halfWord-1 downto 0);
+		variable resultMul: signed (wordLength-1 downto 0);
+		variable resultAdd: signed (wordLength-1 downto 0);
+		begin
+			
+			--0th Bit
+			wordIndex := 0;
+			LSB := registerLength * wordIndex / 2;
+			MSB := (registerLength * wordIndex / 2) + halfWord - 1;
+			
+			var3 := signed( r3( MSB downto LSB ) );
+			var2 := signed( r2( MSB downto LSB ) );
+			resultMul := var3 * var2;
+			
+			resultAdd := resultMul + signed(r1 (MSB downto LSB));
+			
+			--Then, we check for saturation
+			if (saturationCheckAdd( std_logic_vector(r1(((wordIndex+1) * wordLength)-1 downto ((wordIndex+1) * wordLength)-1)), std_logic_vector(resultMul(wordLength-1 downto wordLength-1)), std_logic_vector(resultAdd(wordLength-1 downto wordLength-1)) ) = 1) then
+				--There are two ways to do this. Ultimately, the goal is to replace with 01111111... or 100000... First is to realize that the check of (msb2, msbRd), if different, gives you the
+				--exact order that the over/underflow should be. Can either do directly, or with a reference.
+				--if (msb2, msbRd) = 10, underflow rd <= 100000...
+				--if (msb2, msbRd) = 01, overflow  rd <= 011111...
+				
+					
+				--if (resultMul(wordLength -1) = '0' and resultAdd(wordLength -1) = '1') then
+				--	rd( 62 downto 32) <= (others => '1');
+				--	rd( 63) <= '0';
+				--else
+				--	rd( 62 downto 32) <= (others => '0');
+				--	rd( 63) <= '1';
+				--end if;
+				
+				
+				--Replace the rd with the first bit from resultMul, then the rest from the MSB of resultAdd
+				resultAdd(wordLength-1 downto 0) := (others => resultAdd(wordLength-1));
+				rd(LSB + wordLength-1 downto LSB) <= std_logic_vector(resultMul(wordLength-1 downto wordLength-1)) & std_logic_vector(resultAdd(wordLength - 2 downto 0));
+			else
+				rd( LSB + wordLength-1 downto LSB ) <= std_logic_vector(resultAdd);
+			end if;
+			
+			
+			--1st Bit
+			wordIndex := 1;
+			LSB := registerLength * wordIndex / 2;
+			MSB := (registerLength * wordIndex / 2) + halfWord - 1;
+			
+			var3 := signed( r3( MSB downto LSB ) );
+			var2 := signed( r2( MSB downto LSB ) );
+			resultMul := var3 * var2;
+			
+			resultAdd := resultMul + signed(r1 (MSB downto LSB));
+			--resultAdd := resultMul;
+			
+			--Then, we check for saturation
+			if (saturationCheckAdd( std_logic_vector(r1(((wordIndex+1) * wordLength)-1 downto ((wordIndex+1) * wordLength)-1)), std_logic_vector(resultMul(wordLength-1 downto wordLength-1)), std_logic_vector(resultAdd(wordLength-1 downto wordLength-1)) ) = 1) then				
+				--Replace the rd with the first bit from resultMul, then the rest from the MSB of resultAdd
+				resultAdd(wordLength-1 downto 0) := (others => resultAdd(wordLength-1));
+				rd(LSB + wordLength-1 downto LSB) <= std_logic_vector(resultMul(wordLength-1 downto wordLength-1)) & std_logic_vector(resultAdd(wordLength - 2 downto 0));
+			else
+				rd( LSB + wordLength-1 downto LSB ) <= std_logic_vector(resultAdd);
+			end if;
+	
+			
+	end longMulAddLo;
+-------------------------------------------------------------------------------------
+
+---101-Signed Long Multiply-Add High with Saturation used in R4 instruction Type---
+--The only real time you have to worry about saturation is after the addition/subtraction
+
+	procedure longMulAddHi(signal r1, r2, r3: in std_logic_vector(registerLength-1 downto 0);
 	signal rd: out std_logic_vector(registerLength-1 downto 0)) is
 		variable wordIndex: integer;
 		variable halfWord: integer := 32;
@@ -415,9 +727,9 @@ architecture Behavioral of ALU is
 				
 				--Replace the rd with the first bit from resultMul, then the rest from the MSB of resultAdd
 				resultAdd(wordLength-1 downto 0) := (others => resultAdd(wordLength-1));
-				rd(LSB + wordLength-1 downto LSB) <= std_logic_vector(resultMul(wordLength-1 downto wordLength-1)) & std_logic_vector(resultAdd(wordLength - 2 downto 0));
+				rd(MSB downto LSB - halfWord) <= std_logic_vector(resultMul(wordLength-1 downto wordLength-1)) & std_logic_vector(resultAdd(wordLength - 2 downto 0));
 			else
-				rd( LSB + wordLength-1 downto LSB ) <= std_logic_vector(resultAdd);
+				rd( MSB downto LSB - halfWord ) <= std_logic_vector(resultAdd);
 			end if;
 			
 			
@@ -437,14 +749,14 @@ architecture Behavioral of ALU is
 			if (saturationCheckAdd( std_logic_vector(r1(((wordIndex+1) * wordLength)-1 downto ((wordIndex+1) * wordLength)-1)), std_logic_vector(resultMul(wordLength-1 downto wordLength-1)), std_logic_vector(resultAdd(wordLength-1 downto wordLength-1)) ) = 1) then				
 				--Replace the rd with the first bit from resultMul, then the rest from the MSB of resultAdd
 				resultAdd(wordLength-1 downto 0) := (others => resultAdd(wordLength-1));
-				rd(LSB + wordLength-1 downto LSB) <= std_logic_vector(resultMul(wordLength-1 downto wordLength-1)) & std_logic_vector(resultAdd(wordLength - 2 downto 0));
+				rd(MSB downto LSB - halfWord) <= std_logic_vector(resultMul(wordLength-1 downto wordLength-1)) & std_logic_vector(resultAdd(wordLength - 2 downto 0));
 			else
-				rd( LSB + wordLength-1 downto LSB ) <= std_logic_vector(resultAdd);
+				rd( MSB downto LSB - halfWord ) <= std_logic_vector(resultAdd);
 			end if;
 	
 			
-	end longMulAddLo;
--------------------------------------------------------------------------------------
+	end longMulAddHi;
+------------------------------------------------------------------------------------
 
 
 ---110-Signed Long Multiply-Sub Low with Saturation used in R4 instruction Type---
@@ -871,11 +1183,11 @@ begin
     --Otherwise, we're at 10: Instruction is R4 type
         case wordIn(22 downto 20) is
             when "000" => intMulAddLo(rs1, rs2, rs3, rd);
-            when "001" => r4 <= intMulAddHi;
+            when "001" => intMulAddHi(rs1, rs2, rs3, rd);
             when "010" => intMulSubLo(rs1, rs2, rs3, rd);
-            when "011" => r4 <= intMulSubHi;
+            when "011" => intMulSubHi(rs1, rs2, rs3, rd);
             when "100" => longMulAddLo(rs1, rs2, rs3, rd);
-            when "101" => r4 <= longMulAddHi;
+            when "101" => longMulAddHi(rs1, rs2, rs3, rd);
             when "110" => longMulSubLo(rs1, rs2, rs3, rd);
             when "111" => r4 <= longMulSubHi;
             when others => r4 <= NUL;
