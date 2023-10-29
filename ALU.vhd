@@ -625,7 +625,8 @@ architecture Behavioral of ALU is
 			var2 := signed( r2( MSB downto LSB ) );
 			resultMul := var3 * var2;
 			
-			resultAdd := resultMul + signed(r1 (MSB downto LSB));
+			resultAdd := resultMul + signed(r1 (MSB + halfWord downto LSB));
+			--resultAdd := signed(r1 (MSB + halfWord downto LSB));
 			
 			--Then, we check for saturation
 			if (saturationCheckAdd( std_logic_vector(r1(((wordIndex+1) * wordLength)-1 downto ((wordIndex+1) * wordLength)-1)), std_logic_vector(resultMul(wordLength-1 downto wordLength-1)), std_logic_vector(resultAdd(wordLength-1 downto wordLength-1)) ) = 1) then
@@ -661,7 +662,7 @@ architecture Behavioral of ALU is
 			var2 := signed( r2( MSB downto LSB ) );
 			resultMul := var3 * var2;
 			
-			resultAdd := resultMul + signed(r1 (MSB downto LSB));
+			resultAdd := resultMul + signed(r1 (MSB + halfWord downto LSB));
 			--resultAdd := resultMul;
 			
 			--Then, we check for saturation
@@ -701,7 +702,8 @@ architecture Behavioral of ALU is
 			var2 := signed( r2( MSB downto LSB ) );
 			resultMul := var3 * var2;
 			
-			resultAdd := resultMul + signed(r1 (MSB + halfWord downto LSB));
+			resultAdd := resultMul + signed(r1 (MSB downto MSB - wordLength + 1));
+		
 			
 			--Then, we check for saturation
 			if (saturationCheckAdd( std_logic_vector(r1(((wordIndex+1) * wordLength)-1 downto ((wordIndex+1) * wordLength)-1)), std_logic_vector(resultMul(wordLength-1 downto wordLength-1)), std_logic_vector(resultAdd(wordLength-1 downto wordLength-1)) ) = 1) then
@@ -730,18 +732,18 @@ architecture Behavioral of ALU is
 			
 			--1st Bit
 			wordIndex := 1;
-			LSB := registerLength * wordIndex / 2;
-			MSB := (registerLength * wordIndex / 2) + halfWord - 1;
+			LSB := (registerLength * wordIndex / 2)+ halfWord;
+			MSB := ((registerLength * wordIndex / 2) + wordLength - 1);
 			
 			var3 := signed( r3( MSB downto LSB ) );
 			var2 := signed( r2( MSB downto LSB ) );
 			resultMul := var3 * var2;
 			
-			resultAdd := resultMul + signed(r1 (MSB + halfWord downto LSB));
-			--resultAdd := resultMul;
+			resultAdd := resultMul + signed(r1 (MSB downto MSB - wordLength + 1));
+		
 			
 			--Then, we check for saturation
-			if (saturationCheckAdd( std_logic_vector(r1(((wordIndex+1) * wordLength)-1 downto ((wordIndex+1) * wordLength)-1)), std_logic_vector(resultMul(wordLength-1 downto wordLength-1)), std_logic_vector(resultAdd(wordLength-1 downto wordLength-1)) ) = 1) then				
+			if (saturationCheckAdd( std_logic_vector(r1(((wordIndex+1) * wordLength)-1 downto ((wordIndex+1) * wordLength)-1)), std_logic_vector(resultMul(wordLength-1 downto wordLength-1)), std_logic_vector(resultAdd(wordLength-1 downto wordLength-1)) ) = 1) then
 				--Replace the rd with the first bit from resultMul, then the rest from the MSB of resultAdd
 				resultAdd(wordLength-1 downto 0) := (others => resultAdd(wordLength-1));
 				rd(MSB downto LSB - halfWord) <= std_logic_vector(resultMul(wordLength-1 downto wordLength-1)) & std_logic_vector(resultAdd(wordLength - 2 downto 0));

@@ -89,9 +89,9 @@ begin
 			wait for 10 ns;		
 			
 			-- Testing the load immediate Function
-            -- wordIn can be something like 0 010 1100000000100011 00000
+            -- wordIn can be something like 0 000 1100000000100011 00000
             -- This will load 0xC023 into the last 16 bits of register rd
-            wordIn <= "0010110000000010001100000"; 
+            wordIn <= "0000010000000010001100000"; 
 			
 			wait for 10 ns;		
 			
@@ -223,15 +223,16 @@ begin
 			--That is: (0*0) = 0 - 4,294,967,296 = -4,294,967,296, or 0x1000_0000
 			
 			--3rd
-			--Testing the normal operation
-			--Set the 1st set of 32 bits of rs1 to 0x7FFF_FFFF, the highest 32 bit number
+			--Testing the underflow operation
+			--Set the 1st set of 32 bits of rs1 to 0x8000_0000, the lowest 32 bit number
 			--Set the 1st set of 16 bits of rs2 to 0x8000, The lowest 16 bit number 
 			--Set the 1st set of 16 bits of rs3 to 0x7FFF, The Highest 16 bit number
-			--That is: (32,767*-32,767) = -1,073,676,289 + 4,294,967,296 = ______
+			--That is: (32,767*-32,768) = -1,073,709,056 - 2147483647 = Saturate to 8000_0000
+
 			wordIn <= "1000000000000000000000000";
-			rs1 <= X"7FFFFFFF100000007FFFFFFC00000003";
+			rs1 <= X"80000000100000007FFFFFFC00000003";
 			rs2 <= X"000080000000000000007FFF00000005";
-			rs3 <= X"00000FFF000000000000000200000005"; 
+			rs3 <= X"00007FFF000000000000000200000005"; 
 			
 			wait for 10 ns;
 			
@@ -260,15 +261,16 @@ begin
 			--That is: (0*0) = 0 - 4,294,967,296 = -4,294,967,296, or 0x1000_0000
 			
 			--3rd
-			--Testing the normal operation
-			--Set the 1st set of 32 bits of rs1 to 0x7FFF_FFFF, the highest 32 bit number
+			--Testing the underflow operation
+			--Set the 1st set of 32 bits of rs1 to 0x8000_0000, the lowest 32 bit number
 			--Set the 1st set of 16 bits of rs2 to 0x8000, The lowest 16 bit number 
 			--Set the 1st set of 16 bits of rs3 to 0x7FFF, The Highest 16 bit number
-			--That is: (32,767*-32,767) = -1,073,676,289 + 4,294,967,296 = ______
+			--That is: (32,767*-32,768) = -1,073,709,056 - 2147483647 = Saturate to 8000_0000
+
 			wordIn <= "1000100000000000000000000";
-			rs1 <= X"7FFFFFFF100000007FFFFFFC00000003";
+			rs1 <= X"80000000100000007FFFFFFC00000003";
 			rs2 <= X"80000000000000007FFF000000050000";
-			rs3 <= X"FFFF0000000000000002000000050000"; 
+			rs3 <= X"7FFF0000000000000002000000050000"; 
 			
 			wait for 10 ns;
 			
@@ -279,7 +281,7 @@ begin
 			--Set the 0th set of 32 bits of rs1 to 3  
 			--Set the 0th set of 32 bits of rs2 to 5 
 			--Set the 0th set of 32 bits of rs3 to 5
-			--That is: (5*5) - 3 = 22, which is 0x1_0110
+			--That is: (5*5) - 3 = 22, which is 0b1_0110
 			
 			--1st
 			--Testing the Underflow portion
