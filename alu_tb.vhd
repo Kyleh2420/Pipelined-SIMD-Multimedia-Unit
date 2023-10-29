@@ -497,6 +497,86 @@ begin
 			wait for 10 ns;
 			
 			
+			--Testing for 0001 SHRHI
+			-- wordIn is 1 1 0000 0001 00000 00000 00000
+			wordIn <= "1100000001000000000000000";
+			rs1 <= X"00000000000000000000000000000000";
+			rs2 <= X"00000000000000000000000000000000";
+			wait for 10 ns;
+			
+			--Testing for 0010 AU - add word unsigned
+			-- wordIn is 1 1 0000 0010 00000 00000 00000
+			-- Expect rd = "CA864202 00000000 7FFFFFFF 001B4240"
+			wordIn <= "1100000001000000000000000";		 --regular case, do not overflow
+			rs1 <= X"654321010000000000000000000F4240";
+			rs2 <= X"65432101000000007FFFFFFF000C0000";
+			wait for 10 ns;
+			
+			wordIn <= "1100000001000000000000000";
+			rs1 <= X"F0000000000F424000000000000F4240";
+			rs2 <= X"7FFFFFFF000000007FFFFFFF00000000";
+			wait for 10 ns;
+			
+			
+			--DONE Testing for 0011 CNT1H - count 1s in halfword
+			-- wordIn is 1 1 0000 0011 00000 00000 00000
+			-- Expect rd = "0004 0000 0004 0002 0000 0000 0004 0003"	 "4 0 4 2 0 0 4 3"
+			wordIn <= "1100000011000000000000000";
+			rs1 <= X"F0000000000F404000000000000F4240";	 --
+			rs2 <= X"F0000000000000000000000000000000";	 --r2 not used but put in a 1 to see if that messes up with output
+			wait for 10 ns;
+			
+			--???? Testing for 0100 AHS - add halfword saturated
+			-- wordIn is 1 1 0000 0100 00000 00000 00000
+			-- undersaturated Expect rd = "F000 0000 0000 0000 0000 0000 0000 0000"		
+			wordIn <= "1100000100000000000000000";						 
+			rs1 <= X"F00000000000000000000000000F0000";
+			rs2 <= X"F0000000000000000000000000000000";
+			wait for 10 ns;
+			
+			-- ??? oversaturated rd = "0FFF FFFF FFFF FFFF FFFF FFFF FFFF FFFF"
+			wordIn <= "1100000100000000000000000";						 
+			rs1 <= X"0FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF";
+			rs2 <= X"00000000000000000000000000000011";
+			wait for 10 ns;
+			
+			--DONE Testing for 0110 BCW - broadcast word
+			-- wordIn is 1 1 0000 0110 00000 00000 00000
+			-- Expect rd = "123F 4240 123F 4240 123F 4240 123F 4240"		
+			wordIn <= "1100000110000000000000000";
+			rs1 <= X"F0000000000F404000000000123F4240";	-- only the LSB 8 hex # matter
+			rs2 <= X"10000000000000000000000000000000";
+			wait for 10 ns;
+			
+			--DONE Testing for 0111 MAXWS - max signed word
+			-- wordIn is 1 1 0000 0111 00000 00000 00000
+			-- Expect rd = "123F 4240 000F 4040 123F 4240 123F 4240"		
+			wordIn <= "1100000111000000000000000";
+			rs1 <= X"F000000F000F40400000000000020000";
+			rs2 <= X"123F424000000000123F4240123F4240";
+			wait for 10 ns;	
+				
+			-- Testing for 1000 MINWS - min signed word
+			-- wordIn is 1 1 0000 1000 00000 00000 00000
+			-- Expect rd = "F000 0000 F000 0000 F000 0000 F000 0000"					
+			wordIn <= "1100001000000000000000000";
+			rs1 <= X"F000000000000000F0000000F0000000";
+			rs2 <= X"10000000F00000000000000000000000";
+			wait for 10 ns;	
+		
+			--Testing for 1001 MLHU - multiply low unsigned
+			-- wordIn is 1 1 0000 1001 00000 00000 00000
+			wordIn <= "1100001001000000000000000";
+			rs1 <= X"F0000000000F404000000000000F4240";	 --
+			rs2 <= X"10000000000000000000000000000000";
+			wait for 10 ns;	
+			
+			--Testing for 1010 MLHSS - multiply by sign saturated
+			-- wordIn is 1 1 0000 1010 00000 00000 00000
+			wordIn <= "1100001010000000000000000";
+			rs1 <= X"F0000000000F404000000000000F4240";	 --
+			rs2 <= X"10000000000000000000000000000000";
+			wait for 10 ns;	
 			
 			finish;
         end process;
