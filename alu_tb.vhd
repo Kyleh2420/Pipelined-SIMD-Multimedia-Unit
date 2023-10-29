@@ -62,141 +62,6 @@ begin
         
         testing: process
         begin		   
-			--Testing for ROTW
-			--Set the first 32 bits of rs1 to 1, then others to 0  
-			--Set the last 32 bits of rs2 to 1, then others to 0 
-			-- wordIn is 1 1 0000 1101 00000 00000 00000
-			--RS2 is hexadecimal "00000001 | 00000002 | 00000003 | 00000004"
-			wordIn <= "1100001101000000000000000";
-			rs1 <= X"0123456789ABCDEF0123456789ABCDEF";
-			rs2 <= X"0000000400000003000000040000001F";
-			
-			wait for 10 ns;
-			
-			
-            -- Testing the load immediate Function
-            -- wordIn can be something like 0 001 0000 1111 0000 1111 00000
-            -- This will load 0x0F0F into the second 16 bits of register rd
-            wordIn <= "0001000011110000111100000";
-            
-            wait for 10 ns;
-            
-            -- Testing the load immediate Function
-            -- wordIn can be something like 0 010 1100111100101111 00000
-            -- This will load 0xCF2F into the third 16 bits of register rd
-            wordIn <= "0010110011110010111100000"; 
-			
-			wait for 10 ns;		
-			
-			-- Testing the load immediate Function
-            -- wordIn can be something like 0 000 1100000000100011 00000
-            -- This will load 0xC023 into the last 16 bits of register rd
-            wordIn <= "0000010000000010001100000"; 
-			
-			wait for 10 ns;		
-			
-			--Testing for bitwiseOR
-			--Set the first 32 bits of rs1 to 1, then others to 0  
-			--Set the last 32 bits of rs2 to 1, then others to 0 
-			-- wordIn is 1 1 0000 0101 00000 00000 00000
-			wordIn <= "1100000101000000000000000";
-			rs1 <= (127 downto 95 => '1', others => '0');
-			rs2 <= (31 downto 0 => '1', others => '0');  
-			
-			
-			wait for 10 ns;	
-			
-			--Testing for bitwiseAND
-			--Set the first 32 bits of rs1 to 1, then others to 0  
-			--Set the last 32 bits of rs2 to 1, then others to 0 
-			-- wordIn is 1 1 0000 1011 00000 00000 00000
-			wordIn <= "1100001011000000000000000";
-			rs1 <= (127 downto 95 => '1', others => '0');
-			rs2 <= (100 downto 80 => '1', others => '0');
-			
-			wait for 10 ns;
-			
-			--Testing for INVB
-			--Set the rs1 to all F
-			-- wordIn is 1 1 0000 1100 00000 00000 00000
-			wordIn <= "1100001100000000000000000";
-			rs1 <= (127 downto 0 => '1', others => '0');
-			
-			wait for 10 ns;	
-			
-			--Testing for INVB
-			--Set the rs1 to all 0
-			-- wordIn is 1 1 0000 1100 00000 00000 00000
-			wordIn <= "1100001100000000000000000";
-			rs1 <= (others => '0');
-			
-			wait for 10 ns;
-			
-			--Testing for SFWU
-			-- wordIn is 1 1 0000 1110 00000 00000 00000
-				
-			--0th
-			--Set 0th set of rs1 to 0x0100_0000, which is dec 16,777,216
-			--Set 0th set of rs2 to 0x1000_0000, which is dec 268,435,456
-			--Answer should be placed in last 32 bits of rd
-			--Answer is 0x0F00_0000, or 251,658,240
-			
-			--1st
-			--Testing edge case for SFWU
-			--Set last set of rs2 to 0x0000_0005, which is dec 5
-			--Set last set of rs1 to 0x0000_0007, which is dec 7
-			--Answer should be placed in last 32 bits of rd
-			--Answer is negative when done in decimal.
-			--Answer is unknown right now.
-			
-			wordIn <= "1100001110000000000000000";
-			rs1 <= X"00000000000000000000000700000002";
-			rs2 <= X"00000000000000000000000500000005";  
-			
-			wait for 10 ns;
-			
-			
-			--Testing for SFHS
-			-- wordIn is 1 1 0000 1111 00000 00000 00000
-			
-			--0th
-			--Underflow Condition
-			--Set zeroth set of rs2 to 0x8000, which is most negative number
-			--Set zeroth set of rs1 to 0x0001, which is 1
-			--Answer should be placed in zeroth 16 bits of rd
-			--Answer should underflow - you can't get any more negative
-			--Saturation will kick in, answer is 0x8000
-			
-			--1st
-			--Regular Operation
-			--Set last set of rs2 to 0x8000, which is most negative number
-			--Set last set of rs1 to 0x8000, which is most negative number
-			--Answer should be placed in 1st 16 bits of rd
-			--Answer should 0x0000
-			
-			--2nd
-			--Overflow Condition
-			--Set 2nd set of rs2 to 0x7FFF, which is most postive number
-			--Set 2nd set of rs1 to 0x8000, which is most negative number
-			--Answer should be placed in last 16 bits of rd
-			--Answer should overflow - you can't get anymore positive
-			--Saturation will kick in, answer is 0x7FFF
-			
-			--3rd
-			--Normal Operation
-			--Set 3rd set of rs2 to 0x0005, which is dec 5
-			--Set 3rd set of rs1 to 0x0007, which is dec 7
-			--Answer should be placed in last 16 bits of rd
-			--Answer is -2, which is FFFE
-			
-			wordIn <= "1100001111000000000000000";
-			rs1 <= X"00078000800000010007800080000001";
-			rs2 <= X"00057FFF8000800000057FFF80008000"; 
-			
-			wait for 10 ns;
-						
-            
-			
 			
 			--Testing for R4 Instruction: intMulAddLo
 			-- wordIn is 1 0 000 00000 00000 00000 00000
@@ -458,16 +323,39 @@ begin
 			--Set the 0th set of 64 bits of rs1 to 0x7FFF_FFFF_FFFF_FFFF, the highest 64 bit number 
 			--Set the 0th set of 32 bits of rs2 to 0x7FFF_FFFF 
 			--Set the 0th set of 32 bits of rs3 to 0x7FFF_FFFF
-			--This should result in 0xBFFF_FFFF_0000_0002
+			--This should result in 0x4000 0000 8000 0000
 			
 			--1st
 			--Testing the Normal operation
 			--Set the 1st set of 32 bits of rs1 to 0x8000_0000_0000_0000, the lowest 64 bit number
 			--Set the 1st set of 16 bits of rs2 to 0x8000_0000, The lowest 32 bit number
 			--Set the 1st set of 16 bits of rs3 to 0x7FFF_FFFF, The highest 32 bit number
-			--This should saturate to 0x4000 0000 8000 0000
+			--This should result in to 0xBFFF FFFF 0000 0002
 			wordIn <= "1011000000000000000000000";
 			rs1 <= X"80000000000000007FFFFFFFFFFFFFFF";
+			rs2 <= X"0000000080000000000000007FFFFFFF";
+			rs3 <= X"000000007FFFFFFF000000007FFFFFFF"; 
+			
+			wait for 10 ns;
+			
+			--Testing for R4 Instruction: longMulSubLo
+			-- wordIn is 1 0 110 00000 00000 00000 00000
+			
+			--0th
+			--Overflow Operation
+			--Set the 0th set of 64 bits of rs1 to 0x8000_0000_0000_0000, the lowest 64 bit number 
+			--Set the 0th set of 32 bits of rs2 to 0x7FFF_FFFF 
+			--Set the 0th set of 32 bits of rs3 to 0x7FFF_FFFF
+			--This should result in 0x7FFF_FFFF_FFFF_FFFF
+			
+			--1st
+			--Testing the Underflow Operation
+			--Set the 1st set of 32 bits of rs1 to 0x7FFF_FFFF_FFFF_FFFF, the highest 64 bit number
+			--Set the 1st set of 16 bits of rs2 to 0x8000_0000, The lowest 32 bit number
+			--Set the 1st set of 16 bits of rs3 to 0x7FFF_FFFF, The highest 32 bit number
+			--This should saturate to 0x8000 0000 0000 0000
+			wordIn <= "1011000000000000000000000";
+			rs1 <= X"7FFFFFFFFFFFFFFF8000000000000000";
 			rs2 <= X"0000000080000000000000007FFFFFFF";
 			rs3 <= X"000000007FFFFFFF000000007FFFFFFF"; 
 			
@@ -481,8 +369,8 @@ begin
 			--Set the 1st set of 64 bits of rs1 to 0x0000_0000_000F_4240, the lowest 64 bit number
 			--Set the 1st set of 32 bits of rs2 to 0x7FFF_FFFF, The highest 32 bit number
 			--Set the 1st set of 32 bits of rs3 to 0x7FFF_FFFF, The highest 32 bit number
-			--That is: (2147483647 * 2147483647) + 1000000 = 4,611,686,014,131,420,609
-			--Expect: 3FFFFFFEFFF0BDC1
+			--That is: (2147483647 * 2147483647) - 1000000 = 4,611,686,014,133,420,609
+			--Expect: 3FFFFFFF000F4241
 			
 			--1st
 			--Normal Operation
@@ -497,6 +385,29 @@ begin
 			rs3 <= X"7FFFFFFF000000007FFFFFFF00000000"; 
 			
 			wait for 10 ns;
+			
+			--Testing for R4 Instruction: longMulSubHi
+			-- wordIn is 1 0 111 00000 00000 00000 00000
+			
+			--0th
+			--Overflow Operation
+			--Set the 0th set of 64 bits of rs1 to 0x8000_0000_0000_0000, the lowest 64 bit number 
+			--Set the 0th set of 32 bits of rs2 to 0x7FFF_FFFF 
+			--Set the 0th set of 32 bits of rs3 to 0x7FFF_FFFF
+			--This should result in 0x7FFF_FFFF_FFFF_FFFF
+			
+			--1st
+			--Testing the Underflow Operation
+			--Set the 1st set of 32 bits of rs1 to 0x7FFF_FFFF_FFFF_FFFF, the highest 64 bit number
+			--Set the 1st set of 16 bits of rs2 to 0x8000_0000, The lowest 32 bit number
+			--Set the 1st set of 16 bits of rs3 to 0x7FFF_FFFF, The highest 32 bit number
+			--This should saturate to 0x8000 0000 0000 0000
+			wordIn <= "1011100000000000000000000";
+			rs1 <= X"7FFFFFFFFFFFFFFF8000000000000000";
+			rs2 <= X"80000000000000007FFFFFFF00000000";
+			rs3 <= X"7FFFFFFF000000007FFFFFFF00000000"; 
+			
+			wait for 10 ns;	
 			
 			
 			--Testing for 0001 SHRHI
@@ -578,7 +489,140 @@ begin
 			wordIn <= "1100001010000000000000000";
 			rs1 <= X"F0000000000F404000000000000F4240";	 --
 			rs2 <= X"10000000000000000000000000000000";
+			wait for 10 ns;
+			
+			--Testing for ROTW
+			--Set the first 32 bits of rs1 to 1, then others to 0  
+			--Set the last 32 bits of rs2 to 1, then others to 0 
+			-- wordIn is 1 1 0000 1101 00000 00000 00000
+			--RS2 is hexadecimal "00000001 | 00000002 | 00000003 | 00000004"
+			wordIn <= "1100001101000000000000000";
+			rs1 <= X"0123456789ABCDEF0123456789ABCDEF";
+			rs2 <= X"0000000400000003000000040000001F";
+			
+			wait for 10 ns;
+			
+			
+            -- Testing the load immediate Function
+            -- wordIn can be something like 0 001 0000 1111 0000 1111 00000
+            -- This will load 0x0F0F into the second 16 bits of register rd
+            wordIn <= "0001000011110000111100000";
+            
+            wait for 10 ns;
+            
+            -- Testing the load immediate Function
+            -- wordIn can be something like 0 010 1100111100101111 00000
+            -- This will load 0xCF2F into the third 16 bits of register rd
+            wordIn <= "0010110011110010111100000"; 
+			
+			wait for 10 ns;		
+			
+			-- Testing the load immediate Function
+            -- wordIn can be something like 0 000 1100000000100011 00000
+            -- This will load 0xC023 into the last 16 bits of register rd
+            wordIn <= "0000010000000010001100000"; 
+			
+			wait for 10 ns;		
+			
+			--Testing for bitwiseOR
+			--Set the first 32 bits of rs1 to 1, then others to 0  
+			--Set the last 32 bits of rs2 to 1, then others to 0 
+			-- wordIn is 1 1 0000 0101 00000 00000 00000
+			wordIn <= "1100000101000000000000000";
+			rs1 <= (127 downto 95 => '1', others => '0');
+			rs2 <= (31 downto 0 => '1', others => '0');  
+			
+			
 			wait for 10 ns;	
+			
+			--Testing for bitwiseAND
+			--Set the first 32 bits of rs1 to 1, then others to 0  
+			--Set the last 32 bits of rs2 to 1, then others to 0 
+			-- wordIn is 1 1 0000 1011 00000 00000 00000
+			wordIn <= "1100001011000000000000000";
+			rs1 <= (127 downto 95 => '1', others => '0');
+			rs2 <= (100 downto 80 => '1', others => '0');
+			
+			wait for 10 ns;
+			
+			--Testing for INVB
+			--Set the rs1 to all F
+			-- wordIn is 1 1 0000 1100 00000 00000 00000
+			wordIn <= "1100001100000000000000000";
+			rs1 <= (127 downto 0 => '1', others => '0');
+			
+			wait for 10 ns;	
+			
+			--Testing for INVB
+			--Set the rs1 to all 0
+			-- wordIn is 1 1 0000 1100 00000 00000 00000
+			wordIn <= "1100001100000000000000000";
+			rs1 <= (others => '0');
+			
+			wait for 10 ns;
+			
+			--Testing for SFWU
+			-- wordIn is 1 1 0000 1110 00000 00000 00000
+				
+			--0th
+			--Set 0th set of rs1 to 0x0100_0000, which is dec 16,777,216
+			--Set 0th set of rs2 to 0x1000_0000, which is dec 268,435,456
+			--Answer should be placed in last 32 bits of rd
+			--Answer is 0x0F00_0000, or 251,658,240
+			
+			--1st
+			--Testing edge case for SFWU
+			--Set last set of rs2 to 0x0000_0005, which is dec 5
+			--Set last set of rs1 to 0x0000_0007, which is dec 7
+			--Answer should be placed in last 32 bits of rd
+			--Answer is negative when done in decimal.
+			--Answer is unknown right now.
+			
+			wordIn <= "1100001110000000000000000";
+			rs1 <= X"00000000000000000000000700000002";
+			rs2 <= X"00000000000000000000000500000005";  
+			
+			wait for 10 ns;
+			
+			
+			--Testing for SFHS
+			-- wordIn is 1 1 0000 1111 00000 00000 00000
+			
+			--0th
+			--Underflow Condition
+			--Set zeroth set of rs2 to 0x8000, which is most negative number
+			--Set zeroth set of rs1 to 0x0001, which is 1
+			--Answer should be placed in zeroth 16 bits of rd
+			--Answer should underflow - you can't get any more negative
+			--Saturation will kick in, answer is 0x8000
+			
+			--1st
+			--Regular Operation
+			--Set last set of rs2 to 0x8000, which is most negative number
+			--Set last set of rs1 to 0x8000, which is most negative number
+			--Answer should be placed in 1st 16 bits of rd
+			--Answer should 0x0000
+			
+			--2nd
+			--Overflow Condition
+			--Set 2nd set of rs2 to 0x7FFF, which is most postive number
+			--Set 2nd set of rs1 to 0x8000, which is most negative number
+			--Answer should be placed in last 16 bits of rd
+			--Answer should overflow - you can't get anymore positive
+			--Saturation will kick in, answer is 0x7FFF
+			
+			--3rd
+			--Normal Operation
+			--Set 3rd set of rs2 to 0x0005, which is dec 5
+			--Set 3rd set of rs1 to 0x0007, which is dec 7
+			--Answer should be placed in last 16 bits of rd
+			--Answer is -2, which is FFFE
+			
+			wordIn <= "1100001111000000000000000";
+			rs1 <= X"00078000800000010007800080000001";
+			rs2 <= X"00057FFF8000800000057FFF80008000"; 
+			
+			wait for 10 ns;
 			
 			finish;
         end process;
