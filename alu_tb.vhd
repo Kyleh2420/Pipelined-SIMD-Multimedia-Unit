@@ -499,17 +499,23 @@ begin
 			wait for 10 ns;
 			
 			
-			--Testing for 0001 SHRHI
+			--DONE? Testing for 0001 SHRHI
 			-- wordIn is 1 1 0000 0001 00000 00000 00000
-			wordIn <= "1100000001000000000000000";
-			rs1 <= X"00000000000000000000000000000000";
-			rs2 <= X"00000000000000000000000000000000";
+			wordIn <= "110000000100000000000000";
+			rs1 <= X"12340000234500000000000023451234";
+			rs2 <= X"00000000000000000000000000000001";
 			wait for 10 ns;
 			
-			--Testing for 0010 AU - add word unsigned
+			-- test again
+			wordIn <= "1100000001000000000000000";
+			rs1 <= X"FFFE000023450000000000001FFFFFFF";
+			rs2 <= X"00000000000000000000000000000002";
+			wait for 10 ns;
+			
+			--DONE Testing for 0010 AU - add word unsigned
 			-- wordIn is 1 1 0000 0010 00000 00000 00000
 			-- Expect rd = "CA864202 00000000 7FFFFFFF 001B4240"
-			wordIn <= "1100000001000000000000000";		 --regular case, do not overflow
+			wordIn <= "1100000010000000000000000";		 --regular case, do not overflow
 			rs1 <= X"654321010000000000000000000F4240";
 			rs2 <= X"65432101000000007FFFFFFF000C0000";
 			wait for 10 ns;

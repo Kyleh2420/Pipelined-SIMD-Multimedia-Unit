@@ -925,12 +925,69 @@ architecture Behavioral of ALU is
 
 ---0001-Procedure to SHRHI in R3 instruction type------------------------------------
    --- refer to ROTW?
-
 	--shift right halfword immediate: packed 16-bit halfword shift right logical of the contents of
-	--register rs1 by the value of the 4 leastsignfiicant bits of instruction field rs2. Each of the results is placed
-	--into the corresponding 16-bitslot in registerrd. Bitsshifted out for each halfword are dropped, and bits
-	--shifted in to each halfword should be zeros. (Comments: 8 separate 16-bit values in each 128-bit
-	--register)
+	--register rs1 by the value of the 4 LSB of instruction field rs2. Each of the results is placed
+	--into the corresponding 16-bit slot in register rd.
+	--Bits shifted out for each halfword are dropped, 
+	--and bits shifted in to each halfword should be zeros. 
+	--(Comments: 8 separate 16-bit values in each 128-bit register)
+	procedure SHRHI(signal r1, r2: in std_logic_vector(registerLength-1 downto 0);
+		signal rd: out std_logic_vector(registerLength-1 downto 0)) is
+		variable hwIndex: integer;
+		variable offset: integer;
+		variable shift: integer := 0;
+	begin
+		shift := to_integer(unsigned(rs2(3 downto 0) ));   -- if need to shift n times
+
+		-- 0th half word
+		hwIndex := 0;
+		offset := (hwIndex*16);
+		rd(15-shift+offset downto offset) <= rs1(offset+15 downto offset+shift);
+		rd(offset-1 downto offset+16-shift) <= (others => '0');
+		
+		-- 1st half word
+		hwIndex := 1;
+		offset := (hwIndex*16);
+		rd(15-shift+offset downto offset) <= rs1(offset+15 downto offset+shift);
+		rd(offset-1 downto offset+16-shift) <= (others => '0');
+		
+		-- 2nd half word
+		hwIndex := 2;
+		offset := (hwIndex*16);
+		rd(15-shift+offset downto offset) <= rs1(offset+15 downto offset+shift);
+		rd(offset-1 downto offset+16-shift) <= (others => '0');
+		
+		-- 3rd half word
+		hwIndex := 3;
+		offset := (hwIndex*16);
+		rd(15-shift+offset downto offset) <= rs1(offset+15 downto offset+shift);
+		rd(offset-1 downto offset+16-shift) <= (others => '0');
+		
+		-- 4th half word
+		hwIndex := 4;
+		offset := (hwIndex*16);
+		rd(15-shift+offset downto offset) <= rs1(offset+15 downto offset+shift);
+		rd(offset-1 downto offset+16-shift) <= (others => '0');
+		
+		-- 5th half word
+		hwIndex := 5;
+		offset := (hwIndex*16);
+		rd(15-shift+offset downto offset) <= rs1(offset+15 downto offset+shift);
+		rd(offset-1 downto offset+16-shift) <= (others => '0');
+		
+		-- 6th half word
+		hwIndex := 6;
+		offset := (hwIndex*16);
+		rd(15-shift+offset downto offset) <= rs1(offset+15 downto offset+shift);
+		rd(offset-1 downto offset+16-shift) <= (others => '0');
+		
+		-- 7th half word
+		hwIndex := 7;
+		offset := (hwIndex*16);
+		rd(15-shift+offset downto offset) <= rs1(offset+15 downto offset+shift);
+		rd(offset-1 downto offset+16-shift) <= (others => '0');
+		
+	end SHRHI;	
 
 
 ---0010-Procedure to compute AU add word unsigned in R3 instruction type-------------
@@ -938,9 +995,9 @@ architecture Behavioral of ALU is
 	procedure AU(signal r1, r2: in std_logic_vector(registerLength-1 downto 0);
 		signal rd: out std_logic_vector(registerLength-1 downto 0)) is
 		variable wordIndex: integer;
-		variable int1: unsigned((registerLength / 4) - 1 downto 0);	   -- unsigned 32bit #
-		variable int2: unsigned((registerLength / 4) - 1 downto 0);
-		variable MSB: integer;									   -- used to make range like 31 downto 0
+		variable int1: unsigned(31 downto 0);	   -- unsigned 32bit #
+		variable int2: unsigned(31 downto 0);
+		variable MSB: integer;
 		variable LSB: integer;
     begin				   
 		-- 0th word 
