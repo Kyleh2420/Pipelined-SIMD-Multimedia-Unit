@@ -918,7 +918,7 @@ architecture Behavioral of ALU is
 	procedure NOP(signal r1, r2: in std_logic_vector(registerLength-1 downto 0);
 	signal rd: out std_logic_vector(registerLength-1 downto 0) ) is
    	begin
-	   	NULL;
+	   	rd <= (others => '0');
 	end NOP;
 
 -------------------------------------------------------------------------------------
@@ -940,51 +940,52 @@ architecture Behavioral of ALU is
 		variable wordIndex: integer;
 		variable int1: unsigned((registerLength / 4) - 1 downto 0);	   -- unsigned 32bit #
 		variable int2: unsigned((registerLength / 4) - 1 downto 0);
-		variable maxBit: integer;									   -- used to make range like 31 downto 0
-		variable minBit: integer;
+		variable MSB: integer;									   -- used to make range like 31 downto 0
+		variable LSB: integer;
     begin				   
 		-- 0th word 
 		-- 31 downto 0
         wordIndex := 0;	
-		maxBit := ((wordIndex+1) * registerLength / 4) - 1;
-		minBit := ((wordIndex) * registerLength / 4);
-		int1 := unsigned(r1(maxBit downto minBit));
-		int2 :=	unsigned(r2(maxBit downto minBit));
-		rd(maxBit downto minBit) <= std_logic_vector(int2 + int1);
+		MSB := ((wordIndex+1) * registerLength / 4) - 1;
+		LSB := ((wordIndex) * registerLength / 4);
+		int1 := unsigned(r1(MSB downto LSB));
+		int2 :=	unsigned(r2(MSB downto LSB));
+		rd(MSB downto LSB) <= std_logic_vector(int2 + int1);
 		
 		--rd(maxBit downto minBit) <=  std_logic_vector(int2 - int1);
 		
-		-- 1st word 
+		-- 1st word
 		-- 63 downto 32
 		wordIndex := 1;
-		maxBit := ((wordIndex+1) * registerLength / 4) - 1;
-		minBit := ((wordIndex) * registerLength / 4);
-		int1 := unsigned(r1(maxBit downto minBit));
-		int2 :=	unsigned(r2(maxBit downto minBit));
-		rd(maxBit downto minBit) <= std_logic_vector(int2 + int1);
+		MSB := ((wordIndex+1) * registerLength / 4) - 1;
+		LSB := ((wordIndex) * registerLength / 4);
+		int1 := unsigned(r1(MSB downto LSB));
+		int2 :=	unsigned(r2(MSB downto LSB));
+		rd(MSB downto LSB) <= std_logic_vector(int2 + int1);
 		
 		-- 2nd word 
 		-- 95 downto 64
 		wordIndex := 2;	
-		maxBit := ((wordIndex+1) * registerLength / 4) - 1;
-		minBit := ((wordIndex) * registerLength / 4);
-		int1 := unsigned(r1(maxBit downto minBit));
-		int2 :=	unsigned(r2(maxBit downto minBit));
-		rd(maxBit downto minBit) <= std_logic_vector(int2 + int1);
+		MSB := ((wordIndex+1) * registerLength / 4) - 1;
+		LSB := ((wordIndex) * registerLength / 4);
+		int1 := unsigned(r1(MSB downto LSB));
+		int2 :=	unsigned(r2(MSB downto LSB));
+		rd(MSB downto LSB) <= std_logic_vector(int2 + int1);
 		
 		-- 3rd word 
 		-- 127 downto 96
 		wordIndex := 3;	
-		maxBit := ((wordIndex+1) * registerLength / 4) - 1;
-		minBit := ((wordIndex) * registerLength / 4);
-		int1 := unsigned(r1(maxBit downto minBit));
-		int2 :=	unsigned(r2(maxBit downto minBit));
-		rd(maxBit downto minBit) <= std_logic_vector(int2 + int1);
+		MSB := registerLength - 1;
+		LSB := ((wordIndex) * registerLength / 4);
+		int1 := unsigned(r1(MSB downto LSB));
+		int2 :=	unsigned(r2(MSB downto LSB));
+		rd(MSB downto LSB) <= std_logic_vector(int2 + int1);
 	end AU;
 ------------------------------------------------------------------------------------
 
 
----0011-Procedure to computer CNT1H in R3 instruction type-------------- may be implemented in for loop later in process(all) section
+---0011-Procedure to computer CNT1H in R3 instruction type--------------------------
+--- may be implemented in for loop later in process(all) section
 	--to be tested			 
 	
 -------------------------------------------------------------------------------------
@@ -1161,24 +1162,12 @@ architecture Behavioral of ALU is
 	procedure MAXWS(signal r1, r2: in std_logic_vector(registerLength-1 downto 0);
 						signal rd: out std_logic_vector(registerLength-1 downto 0)) is
 		variable wordIndex: integer;
-		variable wordLength: integer := 16;
+		variable wordLength: integer := 32;
 		variable int1: signed((registerLength / 4) - 1 downto 0);
 		variable int2: signed((registerLength / 4) - 1 downto 0);
 		variable LSB: integer;
 		variable MSB: integer;			
 	begin
-		
-		-- 0th word
-		wordIndex := 0; 
-		LSB := registerLength * wordIndex / 4;
-		MSB := LSB + wordLength - 1;
-		int1 := signed(r1(MSB downto LSB));
-		int2 :=	signed(r2(MSB downto LSB));
-		if (int1 < int2) then
-			rd(MSB downto LSB) <=  std_logic_vector(int2); --put max value of the word into corresponding spot in rd
-		else
-			rd(MSB downto LSB) <=  std_logic_vector(int1);
-		end if;
 		
 		-- 0th word
 		wordIndex := 0; 
@@ -1236,7 +1225,7 @@ architecture Behavioral of ALU is
 	procedure MINWS(signal r1, r2: in std_logic_vector(registerLength-1 downto 0);
 						signal rd: out std_logic_vector(registerLength-1 downto 0)) is
 		variable wordIndex: integer;
-		variable wordLength: integer := 16;
+		variable wordLength: integer := 32;
 		variable int1: signed((registerLength / 4) - 1 downto 0);
 		variable int2: signed((registerLength / 4) - 1 downto 0);
 		variable LSB: integer;
@@ -1597,7 +1586,8 @@ begin
     variable intTemp: integer;
     variable LSB: integer;
 	variable MSB: integer;
-	variable count : unsigned(15 downto 0) := (others => '0'); 
+	variable count: unsigned(15 downto 0) := (others => '0');
+	variable tempRd: unsigned(registerLength downto 0) := (others => '0');
     begin
 		
 		
@@ -1640,7 +1630,7 @@ begin
         case wordIn(18 downto 15) is
             when "0000" => null;
             when "0001" => selectOpcode <= SHRHI;
-            when "0010" => selectOpcode <= AU;
+            when "0010" => AU(rs1, rs2, rd);
             when "0011" =>
 			--for CNT1H
 			-- idk how to write this for loop in a valid way, in a procedure?
@@ -1648,7 +1638,7 @@ begin
 				for i in 0 to 7 loop
 					count := (others => '0');
 					for bit_num in 0 to 15 loop
-						if (to_integer(unsigned(rs1(bit_num downto bit_num) ) ) = 1) then
+						if (to_integer(unsigned(rs1( ((16*i)+bit_num) downto ((16*i)+bit_num) )))= 1 )then
 							count := count + 1;
 						end if;
 					end loop;
@@ -1660,9 +1650,9 @@ begin
 
             when "0100" => AHS(rs1, rs2, rd);
             when "0101" => bitwiseOR(rs1, rs2, rd);
-            when "0110" => selectOpcode <= BCW;
-            when "0111" => selectOpcode <= MAXWS;
-            when "1000" => selectOpcode <= MINWS;
+            when "0110" => BCW(rs1, rs2, rd);
+            when "0111" => MAXWS(rs1, rs2, rd);
+            when "1000" => MINWS(rs1, rs2, rd);
             when "1001" => selectOpcode <= MLHU;
             when "1010" => selectOpcode <= MLHSS;
             when "1011" => bitwiseAND(rs1, rs2, rd);
