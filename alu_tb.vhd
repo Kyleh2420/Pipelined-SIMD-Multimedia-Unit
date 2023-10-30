@@ -489,23 +489,25 @@ begin
 			-- wordIn is 1 1 0000 1001 00000 00000 00000
 			wordIn <= "1100001001000000000000000";
 			rs1 <= X"FF00FFFF000F40400000010400000003";	 --
-			rs2 <= X"11000001000000000000000200000003";
+			rs2 <= X"11000001000000000000000500000003";
 			wait for 10 ns;	
+			wordIn <= "1000001001000000000000000";
+			wait for 10ns;
 			
 			--Testing for 1010 MLHSS - multiply by sign saturated
 			-- wordIn is 1 1 0000 1010 00000 00000 00000   1850000
 			-- when a 16-bit field of rs2 = 0, rd outputs 0 for that field.
 			-- Expected Rd = "8000 0000 0000 0000 0000 0000 0000 0000"
 			wordIn <= "1100001010000000000000000";
-			rs1 <= X"80000000000F40400000000000004240";	 --
+			rs1 <= X"80000000000000000000000000004240";	 --
 			rs2 <= X"10000000000000000000000000000000";
 			wait for 10 ns;
 			
-			-- when sign of the 16-bit field of rs2 is negative, rd of that field is negative
+			-- DONE when sign of the 16-bit field of rs2 is negative, rd of that field is negative
 			-- Expected Rd = "8000 0000 0000 0000 0000 0000 0000 FFFF"
 			wordIn <= "1100001010000000000000000";
 			rs1 <= X"80000000000F40400000000000000001";	 --
-			rs2 <= X"10000000000000000000000000008000";
+			rs2 <= X"80000000000800000000000000008000";
 			wait for 10 ns;
 			
 			-- when sign of the 16-bit field of rs2 is positive, rd of that field is same as that of rs1

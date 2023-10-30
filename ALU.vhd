@@ -69,8 +69,8 @@ architecture Behavioral of ALU is
 --Return 1 if over/underflow
 --Return 0 if all good
 	
---if (msb2, msbRd) = 10, underflow
---if (msb2, msbRd) = 01, overflow
+--if (msb2, msbRd) = 10, overflow underflow
+--if (msb2, msbRd) = 01,
 	function saturationCheckSub(msb1: std_logic_vector(0 downto 0); msb2: std_logic_vector(0 downto 0); msbRd: std_logic_vector(0 downto 0)) return integer is
     	variable result : integer;
 		begin
@@ -90,6 +90,23 @@ architecture Behavioral of ALU is
 	    
 	    return result;
 	end function saturationCheckSub;
+-------------------------------------------------------------------------------------
+
+----------------------------Saturation Check Mul-------------------------------------
+	function saturationCheckMul(msb1: std_logic_vector(0 downto 0); msb2: std_logic_vector(0 downto 0); msbRd: std_logic_vector(0 downto 0)) return integer is
+	variable result: integer;
+	begin
+		if(msb1 = msb2) then
+			result := 0;	
+		else
+			if (msb2 /= msbRd) then
+				result := 0;
+			else
+				result := 1;
+			end if;
+		end if;
+		return result;	
+	end function saturationCheckMul;
 -------------------------------------------------------------------------------------
 
 ----------------------------Saturation Check Add---------------------------------------
@@ -1397,6 +1414,7 @@ architecture Behavioral of ALU is
 		variable mul2: unsigned((registerLength / 8) - 1 downto 0);
 		variable LSB: integer;
 		variable MSB: integer;
+		variable output: unsigned(15 downto 0);
 	begin
 		-- 0th halfword
 		wordIndex := 0;
@@ -1405,12 +1423,16 @@ architecture Behavioral of ALU is
 		mul1 := unsigned(r1(MSB downto LSB));
 		mul2 := unsigned(r2(MSB downto LSB));
 		if to_integer(mul2) = 0 then
-			rd(MSB downto LSB) <= (others => '0');
-		elsif to_integer(mul2(MSB downto MSB)) = 1 then
-			rd(MSB downto LSB) <= std_logic_vector( (not mul1) + 1);
+			output := (others => '0');
+		elsif to_integer(mul2(15 downto 15)) = 1 then
+			output :=(not mul1) + 1;
 		else
-			rd(MSB downto LSB) <= std_logic_vector(mul1);
+			output := (mul1);
 		end if;		
+		if mul1(15 downto 15) = output(15 downto 15) then		-- saturation happens
+			output(15 downto 0) := ("1111111111111111");	
+		end if;
+		rd(MSB downto LSB) <= std_logic_vector(output(15 downto 0));
 		
 		-- 1st halfword
 		wordIndex := 1; 
@@ -1420,21 +1442,23 @@ architecture Behavioral of ALU is
 		mul2 := unsigned(r2(MSB downto LSB));
 		if to_integer(mul2) = 0 then
 			rd(MSB downto LSB) <= (others => '0');
-		elsif to_integer(mul2(MSB downto MSB)) = 1 then
+		elsif to_integer(mul2(15 downto 15)) = 1 then
 			rd(MSB downto LSB) <= std_logic_vector( (not mul1) + 1);
 		else
 			rd(MSB downto LSB) <= std_logic_vector(mul1);
 		end if;
+--		if saturationCheckMul(std_logic_vector(r1(((wordIndex+1)*16)-1 downto ((wordIndex+1)*16)-1)), std_logic_vector(resultMul(wordLength-1 downto wordLength-1)), std_logic_vector(resultMul(wordLength-1 downto wordLength-1)) ) = 1) 
+
 		
 		-- 2nd halfword
 		wordIndex := 2; 
-		LSB := 32 * wordIndex;
-		MSB := LSB + wordLength - 1;
-		mul1 := unsigned(r1((MSB-16) downto LSB));
-		mul2 := unsigned(r2((MSB-16) downto LSB));
+		LSB := 16 * wordIndex;
+		MSB := LSB + 15;
+		mul1 := unsigned(r1(MSB downto LSB));
+		mul2 := unsigned(r2(MSB downto LSB));
 		if to_integer(mul2) = 0 then
 			rd(MSB downto LSB) <= (others => '0');
-		elsif to_integer(mul2(MSB downto MSB)) = 1 then
+		elsif to_integer(mul2(15 downto 15)) = 1 then
 			rd(MSB downto LSB) <= std_logic_vector( (not mul1) + 1);
 		else
 			rd(MSB downto LSB) <= std_logic_vector(mul1);
@@ -1442,10 +1466,24 @@ architecture Behavioral of ALU is
 		
 		-- 3rd halfword
 		wordIndex := 3; 
-		LSB := 32 * wordIndex;
-		MSB := LSB + wordLength - 1;
-		mul1 := unsigned(r1((MSB-16) downto LSB));
-		mul2 := unsigned(r2((MSB-16) downto LSB));
+		LSB := 16 * wordIndex;
+		MSB := LSB + 15;
+		mul1 := unsigned(r1(MSB downto LSB));
+		mul2 := unsigned(r2(MSB downto LSB));
+		if to_integer(mul2) = 0 then
+			rd(MSB downto LSB) <= (others => '0');
+		elsif to_integer(mul2(15 downto 15)) = 1 then
+			rd(MSB downto LSB) <= std_logic_vector( (not mul1) + 1);
+		else
+			rd(MSB downto LSB) <= std_logic_vector(mul1);
+		end if;
+		
+		-- 4th halfword
+		wordIndex := 4; 
+		LSB := 16 * wordIndex;
+		MSB := LSB + 15;
+		mul1 := unsigned(r1(MSB downto LSB));
+		mul2 := unsigned(r2(MSB downto LSB));
 		if to_integer(mul2) = 0 then
 			rd(MSB downto LSB) <= (others => '0');
 		elsif to_integer(mul2(MSB downto MSB)) = 1 then
@@ -1454,17 +1492,47 @@ architecture Behavioral of ALU is
 			rd(MSB downto LSB) <= std_logic_vector(mul1);
 		end if;
 		
-		-- 4th halfword
-		
-		
 		-- 5th halfword
-		
+		wordIndex := 5; 
+		LSB := 16 * wordIndex;
+		MSB := LSB + 15;
+		mul1 := unsigned(r1(MSB downto LSB));
+		mul2 := unsigned(r2(MSB downto LSB));
+		if to_integer(mul2) = 0 then
+			rd(MSB downto LSB) <= (others => '0');
+		elsif to_integer(mul2(15 downto 15)) = 1 then
+			rd(MSB downto LSB) <= std_logic_vector( (not mul1) + 1);
+		else
+			rd(MSB downto LSB) <= std_logic_vector(mul1);
+		end if;
 
 		-- 6th halfword
-		
+		wordIndex := 6;
+		LSB := 16 * wordIndex;
+		MSB := LSB + 15;
+		mul1 := unsigned(r1(MSB downto LSB));
+		mul2 := unsigned(r2(MSB downto LSB));
+		if to_integer(mul2) = 0 then
+			rd(MSB downto LSB) <= (others => '0');
+		elsif to_integer(mul2(15 downto 15)) = 1 then
+			rd(MSB downto LSB) <= std_logic_vector( (not mul1) + 1);
+		else
+			rd(MSB downto LSB) <= std_logic_vector(mul1);
+		end if;
 
 		-- 7th halfword
-
+		wordIndex := 7; 
+		LSB := 16 * wordIndex;
+		MSB := LSB + 15;
+		mul1 := unsigned(r1(MSB downto LSB));
+		mul2 := unsigned(r2(MSB downto LSB));
+		if to_integer(mul2) = 0 then
+			rd(MSB downto LSB) <= (others => '0');
+		elsif to_integer(mul2(15 downto 15)) = 1 then
+			rd(MSB downto LSB) <= std_logic_vector( (not mul1) + 1);
+		else
+			rd(MSB downto LSB) <= std_logic_vector(mul1);
+		end if;
 	
 	
 	end MLHSS;	
