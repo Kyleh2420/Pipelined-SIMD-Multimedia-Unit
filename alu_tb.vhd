@@ -556,23 +556,42 @@ begin
 			-- wordIn is 1 1 0000 1010 00000 00000 00000   1850000
 			-- when a 16-bit field of rs2 = 0, rd outputs 0 for that field.
 			-- Expected Rd = "8000 0000 0000 0000 0000 0000 0000 0000"
-			wordIn <= "1100001010000000000000000";
-			rs1 <= X"80000000000000000000000000004240";	 --
-			rs2 <= X"10000000000000000000000000000000";
-			wait for 10 ns;
 			
-			-- DONE when sign of the 16-bit field of rs2 is negative, rd of that field is negative
-			-- Expected Rd = "8000 0000 0000 0000 0000 0000 0000 FFFF"
-			wordIn <= "1100001010000000000000000";
-			rs1 <= X"80000000000F40400000000000000001";	 --
-			rs2 <= X"80000000000800000000000000008000";
-			wait for 10 ns;
+			--0th
+			-- 3*-1 = -3
+			-- 3*8000 = FFFD	[hex]
 			
-			-- when sign of the 16-bit field of rs2 is positive, rd of that field is same as that of rs1
-			-- Expected Rd = "8000 0000 0000 0000 0000 0000 0000 FFFF"
+			--1st
+			-- -3 * -1 = 3
+			-- FFFD * 8000 = 3 [Hex]
+			
+			--2nd
+			--saturate
+			-- 8000 * 8000 =	7FFF [Hex]
+			-- -32768 * -1 = 32767  [Dec]
+			
+			--3rd
+			--7FFF * 0001 = 7FFF [Hex]
+			-- 32767 * 1 = 32767  [Dec]
+			
+			--4th
+			-- C56A * 0001 = C56A [Hex]
+			-- -14998 * 1 = -14998  [Dec]
+			
+			--5th
+			-- 5136 * 5691 = 5136 [Hex]
+			-- 5430 * 1 = 5430  [Dec]
+			
+			--6th
+			-- C56A * 8000 = 3A96 [Hex]
+			-- -14998 * -1 = 14998  [Dec]
+			
+			--7th
+			--FFFF * 0001 = FFFF[Hex]
+			-- -1 * 1 = -1  [Dec]
 			wordIn <= "1100001010000000000000000";
-			rs1 <= X"80000000000F404000000000000F4240";	 --
-			rs2 <= X"10000000000000000000000000000001";
+			rs1 <= X"FFFFC56A5136C56A7FFF8000FFFD0003";	 --	
+			rs2 <= X"00018000569100010001800080008000";
 			wait for 10 ns;
 			
 			--Testing for ROTW

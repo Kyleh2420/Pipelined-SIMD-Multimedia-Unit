@@ -1429,8 +1429,8 @@ architecture Behavioral of ALU is
 		else
 			output := (mul1);
 		end if;		
-		if mul1(15 downto 15) = output(15 downto 15) then		-- saturation happens
-			output(15 downto 0) := ("1111111111111111");	
+		if (mul1(15 downto 0) = X"8000" and mul2(15 downto 15) = "1") then		-- saturation happens
+			output(15 downto 0) := ("0111111111111111");
 		end if;
 		rd(MSB downto LSB) <= std_logic_vector(output(15 downto 0));
 		
@@ -1441,14 +1441,17 @@ architecture Behavioral of ALU is
 		mul1 := unsigned(r1(MSB downto LSB));
 		mul2 := unsigned(r2(MSB downto LSB));
 		if to_integer(mul2) = 0 then
-			rd(MSB downto LSB) <= (others => '0');
+			output := (others => '0');
 		elsif to_integer(mul2(15 downto 15)) = 1 then
-			rd(MSB downto LSB) <= std_logic_vector( (not mul1) + 1);
+			output :=(not mul1) + 1;
 		else
-			rd(MSB downto LSB) <= std_logic_vector(mul1);
+			output := (mul1);
+		end if;		
+		if (mul1(15 downto 0) = X"8000" and mul2(15 downto 15) = "1") then		-- saturation happens
+			output(15 downto 0) := ("0111111111111111");
 		end if;
---		if saturationCheckMul(std_logic_vector(r1(((wordIndex+1)*16)-1 downto ((wordIndex+1)*16)-1)), std_logic_vector(resultMul(wordLength-1 downto wordLength-1)), std_logic_vector(resultMul(wordLength-1 downto wordLength-1)) ) = 1) 
-
+		rd(MSB downto LSB) <= std_logic_vector(output(15 downto 0));
+		
 		
 		-- 2nd halfword
 		wordIndex := 2; 
@@ -1457,12 +1460,16 @@ architecture Behavioral of ALU is
 		mul1 := unsigned(r1(MSB downto LSB));
 		mul2 := unsigned(r2(MSB downto LSB));
 		if to_integer(mul2) = 0 then
-			rd(MSB downto LSB) <= (others => '0');
+			output := (others => '0');
 		elsif to_integer(mul2(15 downto 15)) = 1 then
-			rd(MSB downto LSB) <= std_logic_vector( (not mul1) + 1);
+			output :=(not mul1) + 1;
 		else
-			rd(MSB downto LSB) <= std_logic_vector(mul1);
+			output := (mul1);
+		end if;		
+		if (mul1(15 downto 0) = X"8000" and mul2(15 downto 15) = "1") then		-- saturation happens
+			output(15 downto 0) := ("0111111111111111");
 		end if;
+		rd(MSB downto LSB) <= std_logic_vector(output(15 downto 0));
 		
 		-- 3rd halfword
 		wordIndex := 3; 
@@ -1471,12 +1478,16 @@ architecture Behavioral of ALU is
 		mul1 := unsigned(r1(MSB downto LSB));
 		mul2 := unsigned(r2(MSB downto LSB));
 		if to_integer(mul2) = 0 then
-			rd(MSB downto LSB) <= (others => '0');
+			output := (others => '0');
 		elsif to_integer(mul2(15 downto 15)) = 1 then
-			rd(MSB downto LSB) <= std_logic_vector( (not mul1) + 1);
+			output :=(not mul1) + 1;
 		else
-			rd(MSB downto LSB) <= std_logic_vector(mul1);
+			output := (mul1);
+		end if;		
+		if (mul1(15 downto 0) = X"8000" and mul2(15 downto 15) = "1") then		-- saturation happens
+			output(15 downto 0) := ("0111111111111111");
 		end if;
+		rd(MSB downto LSB) <= std_logic_vector(output(15 downto 0));
 		
 		-- 4th halfword
 		wordIndex := 4; 
@@ -1485,12 +1496,16 @@ architecture Behavioral of ALU is
 		mul1 := unsigned(r1(MSB downto LSB));
 		mul2 := unsigned(r2(MSB downto LSB));
 		if to_integer(mul2) = 0 then
-			rd(MSB downto LSB) <= (others => '0');
-		elsif to_integer(mul2(MSB downto MSB)) = 1 then
-			rd(MSB downto LSB) <= std_logic_vector( (not mul1) + 1);
+			output := (others => '0');
+		elsif to_integer(mul2(15 downto 15)) = 1 then
+			output :=(not mul1) + 1;
 		else
-			rd(MSB downto LSB) <= std_logic_vector(mul1);
+			output := (mul1);
+		end if;		
+		if (mul1(15 downto 0) = X"8000" and mul2(15 downto 15) = "1") then		-- saturation happens
+			output(15 downto 0) := ("0111111111111111");
 		end if;
+		rd(MSB downto LSB) <= std_logic_vector(output(15 downto 0));
 		
 		-- 5th halfword
 		wordIndex := 5; 
@@ -1499,12 +1514,16 @@ architecture Behavioral of ALU is
 		mul1 := unsigned(r1(MSB downto LSB));
 		mul2 := unsigned(r2(MSB downto LSB));
 		if to_integer(mul2) = 0 then
-			rd(MSB downto LSB) <= (others => '0');
+			output := (others => '0');
 		elsif to_integer(mul2(15 downto 15)) = 1 then
-			rd(MSB downto LSB) <= std_logic_vector( (not mul1) + 1);
+			output :=(not mul1) + 1;
 		else
-			rd(MSB downto LSB) <= std_logic_vector(mul1);
+			output := (mul1);
+		end if;		
+		if (mul1(15 downto 0) = X"8000" and mul2(15 downto 15) = "1") then		-- saturation happens
+			output(15 downto 0) := ("0111111111111111");
 		end if;
+		rd(MSB downto LSB) <= std_logic_vector(output(15 downto 0));
 
 		-- 6th halfword
 		wordIndex := 6;
@@ -1513,12 +1532,16 @@ architecture Behavioral of ALU is
 		mul1 := unsigned(r1(MSB downto LSB));
 		mul2 := unsigned(r2(MSB downto LSB));
 		if to_integer(mul2) = 0 then
-			rd(MSB downto LSB) <= (others => '0');
+			output := (others => '0');
 		elsif to_integer(mul2(15 downto 15)) = 1 then
-			rd(MSB downto LSB) <= std_logic_vector( (not mul1) + 1);
+			output :=(not mul1) + 1;
 		else
-			rd(MSB downto LSB) <= std_logic_vector(mul1);
+			output := (mul1);
+		end if;		
+		if (mul1(15 downto 0) = X"8000" and mul2(15 downto 15) = "1") then		-- saturation happens
+			output(15 downto 0) := ("0111111111111111");
 		end if;
+		rd(MSB downto LSB) <= std_logic_vector(output(15 downto 0));
 
 		-- 7th halfword
 		wordIndex := 7; 
@@ -1527,12 +1550,16 @@ architecture Behavioral of ALU is
 		mul1 := unsigned(r1(MSB downto LSB));
 		mul2 := unsigned(r2(MSB downto LSB));
 		if to_integer(mul2) = 0 then
-			rd(MSB downto LSB) <= (others => '0');
+			output := (others => '0');
 		elsif to_integer(mul2(15 downto 15)) = 1 then
-			rd(MSB downto LSB) <= std_logic_vector( (not mul1) + 1);
+			output :=(not mul1) + 1;
 		else
-			rd(MSB downto LSB) <= std_logic_vector(mul1);
+			output := (mul1);
+		end if;		
+		if (mul1(15 downto 0) = X"8000" and mul2(15 downto 15) = "1") then		-- saturation happens
+			output(15 downto 0) := ("0111111111111111");
 		end if;
+		rd(MSB downto LSB) <= std_logic_vector(output(15 downto 0));
 	
 	
 	end MLHSS;	
