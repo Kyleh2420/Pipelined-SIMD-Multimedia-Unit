@@ -407,21 +407,35 @@ begin
 			rs2 <= X"80000000000000007FFFFFFF00000000";
 			rs3 <= X"7FFFFFFF000000007FFFFFFF00000000"; 
 		
-			wait for 10 ns;	
+			wait for 10 ns;	  
 			
-			
-			--DONE! Testing for 0001 SHRHI
-			-- wordIn is 1 1 0000 0001 00000 00000 00000
-			wordIn <= "1100000001000000000000000";
-			rs1 <= X"12340000234500000000000023451234";
-			rs2 <= X"00000000000000000000000000000001";
+			--DONE! Testing for 0000 NOP			   
+			-- wordIn is 1 1 0000 0000 00000 00000 00000
+			--No matter what the register values are, we should output 0s
+			--This will be taken care of by the register file, not the ALU.
+			wordIn <= "1100000000000000000000000";
 			wait for 10 ns;
 			
-			--DONE! test again rotate right 2 digits
+			--DONE! Testing for 0001 SHRHI			   
+			-- wordIn is 1 1 0000 0001 00001 00000 00000
+			--Shift right by 1
+			wordIn <= "1100000001000010000000000";
+			rs1 <= X"12340000234500000000000023451234";
+			wait for 10 ns;
+			
+			--DONE! Testing for 0001 SHRHI
+			-- wordIn is 1 1 0000 0001 00100 00000 00000
+			--Shift right by 4
+			wordIn <= "1100000001001000000000000";
+			rs1 <= X"12340000234500002350009023451234";
+			wait for 10 ns;
+			
+			--DONE! test again rotate right 8 digits
+			-- wordIn is 1 1 0000 0001 01000 00000 00000
+			-- Shift right by 8
 			-- Expected rd = "FFFF0000 11A28000 00000000 0FFFFFFF"
-			wordIn <= "1100000001000000000000000";
+			wordIn <= "1100000001010000000000000";
 			rs1 <= X"FFFE000023450000000000001FFFFFFF";
-			rs2 <= X"00000000000000000000000000000002";
 			wait for 10 ns;
 			
 			--DONE Testing for 0010 AU - add word unsigned
@@ -441,24 +455,53 @@ begin
 			rs2 <= X"F0000000000000000000000000000000";	 --r2 not used but put in a 1 to see if that messes up with output
 			wait for 10 ns;
 			
-			--???? Testing for 0100 AHS - add halfword saturated
+			--DONE Testing for 0100 AHS - add halfword saturated saturated
 			-- wordIn is 1 1 0000 0100 00000 00000 00000
-			-- Normal operation of simply adding
+			--0th
+			--Normal Operation
+			--Set zeroth set of rs2 to 0x1AB5, which is 6,837
+			--Set zeroth set of rs1 to 0x9263, which is 37475
+			--Answer should be placed in zeroth 16 bits of rd
+			--Answer is 44,312, answer is 0xAD18
+			
+			--1st
+			--Underflow Operation
+			--Set last set of rs2 to 0x8000, which is most negative number
+			--Set last set of rs1 to 0x8000, which is most negative number
+			--Answer should underflow - 16 bits can't get more negative than 8000
+			--Answer should 0x8000
+			
+			--2nd
+			--Overflow Condition
+			--Set 2nd set of rs2 to 0x7FFF, which is most postive number
+			--Set 2nd set of rs1 to 0x0005, which is 5
+			--Answer should be placed in last 16 bits of rd
+			--Answer should overflow - you can't get anymore positive
+			--Saturation will kick in, answer is 0x7FFF
+			
+			--3rd
+			--Normal Operation
+			--Set 3rd set of rs2 to 0x0005, which is dec 5
+			--Set 3rd set of rs1 to 0x0007, which is dec 7
+			--Answer should be placed in last 16 bits of rd
+			--Answer is 12, which is 000C  
+			
+			--Repeat for index 4 to 7
 			wordIn <= "1100000100000000000000000";						 
-			rs1 <= X"100000000000000000000000123F0000";
-			rs2 <= X"C0000000000000000000000012300000";
+			rs1 <= X"00070005800092630007000580009263";
+			rs2 <= X"00057FFF80001AB500057FFF80001AB5";
 			wait for 10 ns;
 			
-			-- undersaturated Expect rd = "F000 0000 0000 0000 0000 0000 0000 0000"		
-			wordIn <= "1100000100000000000000000";						 
-			rs1 <= X"F00000000000000000000000000FF000";
-			rs2 <= X"F000000000000000000000000000F000";
-			wait for 10 ns;
 			
-			-- ??? oversaturated rd = "0FFF FFFF FFFF FFFF FFFF FFFF FFFF FFFF"
-			wordIn <= "1100000100000000000000000";						 
-			rs1 <= X"0FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF";
-			rs2 <= X"00000000000000000000000000000011";
+			--Testing for 0101 bitwiseOR
+			--Set the first 32 bits of rs1 to 1, then others to 0  
+			--Set the last 32 bits of rs2 to 1, then others to 0 
+			-- wordIn is 1 1 0000 0101 00000 00000 00000
+			wordIn <= "1100000101000000000000000";
+			rs1 <= (100 downto 80 => '1', others => '0');
+			rs2 <= (90 downto 50 => '1', others => '0');  
+			
+			
 			wait for 10 ns;
 			
 			--DONE Testing for 0110 BCW - broadcast word
@@ -487,9 +530,24 @@ begin
 		
 			--DONE Testing for 1001 MLHU - multiply low unsigned
 			-- wordIn is 1 1 0000 1001 00000 00000 00000
+			
+			--0th
+			--3*3 = 9
+			
+			--1st
+			--104 * 2 = 208 [Hex]
+			--260 * 2 = 520 [Dec]
+			
+			--2nd
+			--4040 * FFFF =	1043F3BBFC0	     [Hex]
+			--16448 * 65535 = 1,077,919,680  [Dec]
+			
+			--3rd
+			--FFFF * 0001 = FFFF [Hex]
+			--65535 * 1 = 65535  [Dec]
 			wordIn <= "1100001001000000000000000";
-			rs1 <= X"FF00FFFF000F40400000010400000003";	 --
-			rs2 <= X"11000001000000000000000500000003";
+			rs1 <= X"FF00FFFF000F40400000010400000003";
+			rs2 <= X"110000010000FFFF0000000200000003";
 			wait for 10 ns;	
 			wordIn <= "1000001001000000000000000";
 			wait for 10ns;
@@ -602,7 +660,20 @@ begin
 			--Set last set of rs1 to 0x0000_0007, which is dec 7
 			--Answer should be placed in last 32 bits of rd
 			--Answer is negative when done in decimal.
-			--Answer is unknown right now.
+			--Answer is should underflow to FFFF_FFFE
+			
+			--3rd
+			--Set last set of rs2 to 0xFFFF_FFFF, which is dec 4,294,967,295
+			--Set last set of rs1 to 0x0000_1CF3, which is dec 7,411
+			--Answer is negative when done in decimal.
+			--Answer is should underflow to FFFF_E30C
+			
+			--4th
+			--Testing edge case for SFWU
+			--Set last set of rs2 to 0x1000_0000, which is dec 16,777,216
+			--Set last set of rs1 to 0x0100_0000, which is dec 268,435,456
+			--Answer should be placed in last 32 bits of rd.
+			--Answer is 0x0F00_0000, or 251,658,240
 			
 			wordIn <= "1100001110000000000000000";
 			rs1 <= X"00000000000000000000000700000002";

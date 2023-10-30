@@ -941,20 +941,20 @@ architecture Behavioral of ALU is
 -------------------------------------------------------------------------------------
 
 ---0001-Procedure to SHRHI in R3 instruction type------------------------------------
-   --- refer to ROTW?
 	--shift right halfword immediate: packed 16-bit halfword shift right logical of the contents of
 	--register rs1 by the value of the 4 LSB of instruction field rs2. Each of the results is placed
 	--into the corresponding 16-bit slot in register rd.
 	--Bits shifted out for each halfword are dropped, 
 	--and bits shifted in to each halfword should be zeros. 
 	--(Comments: 8 separate 16-bit values in each 128-bit register)
-	procedure SHRHI(signal r1, r2: in std_logic_vector(registerLength-1 downto 0);
-		signal rd: out std_logic_vector(registerLength-1 downto 0)) is
+	procedure SHRHI(signal r1: in std_logic_vector(registerLength-1 downto 0);
+					signal opcode: in std_logic_vector(24 downto 0);
+					signal rd: out std_logic_vector(registerLength-1 downto 0)) is
 		variable hwIndex: integer;
 		variable offset: integer;
 		variable shift: integer := 0;
 	begin
-		shift := to_integer(unsigned(r2(3 downto 0) ));   -- if need to shift n times
+		shift := to_integer(unsigned(opcode(13 downto 10) ));   -- if need to shift n times
 
 		-- 0th half word
 		hwIndex := 0;
@@ -1884,8 +1884,8 @@ begin
     
         --Figure out what opcode the R3 instruction type is telling us to do.
         case wordIn(18 downto 15) is
-            when "0000" => null;
-            when "0001" => SHRHI(rs1, rs2, rd);
+            when "0000" => rd <= (others => '0');
+            when "0001" => SHRHI(rs1, wordIn, rd);
             when "0010" => AU(rs1, rs2, rd);
             when "0011" =>
 			--for CNT1H
