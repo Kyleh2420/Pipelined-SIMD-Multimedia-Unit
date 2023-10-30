@@ -61,28 +61,7 @@ begin
                 rd => rd);
         
         testing: process
-        begin	
-			
-			-- Testing the load immediate Function
-            -- wordIn can be something like 0 001 0000 1111 0000 1111 00000
-            -- This will load 0x0F0F into the second 16 bits of register rd
-            wordIn <= "0001000011110000111100000";
-            
-            wait for 10 ns;
-            
-            -- Testing the load immediate Function
-            -- wordIn can be something like 0 010 1100111100101111 00000
-            -- This will load 0xCF2F into the third 16 bits of register rd
-            wordIn <= "0010110011110010111100000"; 
-			
-			wait for 10 ns;		
-			
-			-- Testing the load immediate Function
-            -- wordIn can be something like 0 000 1100000000100011 00000
-            -- This will load 0xC023 into the last 16 bits of register rd
-            wordIn <= "0000010000000010001100000"; 
-			
-			wait for 10 ns;
+        begin		   
 			
 			--Testing for R4 Instruction: intMulAddLo
 			-- wordIn is 1 0 000 00000 00000 00000 00000
@@ -430,12 +409,6 @@ begin
 		
 			wait for 10 ns;	
 			
-			--DONE! Testing for 0001 SHRHI
-			-- wordIn is 1 1 0000 0001 00000 00000 00000
-			wordIn <= "1100000001000000000000000";
-			rs1 <= X"12340000234500000000000023451234";
-			rs2 <= X"00000000000000000000000000000001";
-			wait for 10 ns;
 			
 			--DONE! Testing for 0001 SHRHI
 			-- wordIn is 1 1 0000 0001 00000 00000 00000
@@ -466,7 +439,7 @@ begin
 			wordIn <= "1100000011000000000000000";
 			rs1 <= X"F0000000000F404000000000000F4240";	 --
 			rs2 <= X"F0000000000000000000000000000000";	 --r2 not used but put in a 1 to see if that messes up with output
-			wait for 10 ns;		
+			wait for 10 ns;
 			
 			--???? Testing for 0100 AHS - add halfword saturated
 			-- wordIn is 1 1 0000 0100 00000 00000 00000
@@ -486,17 +459,6 @@ begin
 			wordIn <= "1100000100000000000000000";						 
 			rs1 <= X"0FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF";
 			rs2 <= X"00000000000000000000000000000011";
-			wait for 10 ns;
-			
-			--Testing for 0101 bitwiseOR
-			--Set the first 32 bits of rs1 to 1, then others to 0  
-			--Set the last 32 bits of rs2 to 1, then others to 0 
-			-- wordIn is 1 1 0000 0101 00000 00000 00000
-			wordIn <= "1100000101000000000000000";
-			rs1 <= (100 downto 80 => '1', others => '0');
-			rs2 <= (90 downto 50 => '1', others => '0');  
-			
-			
 			wait for 10 ns;
 			
 			--DONE Testing for 0110 BCW - broadcast word
@@ -523,37 +485,35 @@ begin
 			rs2 <= X"10000000F00000001000000000000000";
 			wait for 10 ns;	
 		
-			--Testing for 1001 MLHU - multiply low unsigned
+			--DONE Testing for 1001 MLHU - multiply low unsigned
 			-- wordIn is 1 1 0000 1001 00000 00000 00000
 			wordIn <= "1100001001000000000000000";
-			rs1 <= X"F0000000000F404000000000000F4240";	 --
-			rs2 <= X"10000000000000000000000000000000";
+			rs1 <= X"FF00FFFF000F40400000010400000003";	 --
+			rs2 <= X"11000001000000000000000200000003";
 			wait for 10 ns;	
 			
 			--Testing for 1010 MLHSS - multiply by sign saturated
-			-- wordIn is 1 1 0000 1010 00000 00000 00000
+			-- wordIn is 1 1 0000 1010 00000 00000 00000   1850000
+			-- when a 16-bit field of rs2 = 0, rd outputs 0 for that field.
+			-- Expected Rd = "8000 0000 0000 0000 0000 0000 0000 0000"
 			wordIn <= "1100001010000000000000000";
-			rs1 <= X"F0000000000F404000000000000F4240";	 --
+			rs1 <= X"80000000000F40400000000000004240";	 --
 			rs2 <= X"10000000000000000000000000000000";
 			wait for 10 ns;
 			
-			--Testing for bitwiseAND
-			--Set the first 32 bits of rs1 to 1, then others to 0  
-			--Set the last 32 bits of rs2 to 1, then others to 0 
-			-- wordIn is 1 1 0000 1011 00000 00000 00000
-			wordIn <= "1100001011000000000000000";
-			rs1 <= (127 downto 95 => '1', others => '0');
-			rs2 <= (100 downto 80 => '1', others => '0');
+			-- when sign of the 16-bit field of rs2 is negative, rd of that field is negative
+			-- Expected Rd = "8000 0000 0000 0000 0000 0000 0000 FFFF"
+			wordIn <= "1100001010000000000000000";
+			rs1 <= X"80000000000F40400000000000000001";	 --
+			rs2 <= X"10000000000000000000000000008000";
+			wait for 10 ns;
 			
-			wait for 10 ns;	
-			
-			--Testing for INVB
-			--Set the rs1 to all F
-			-- wordIn is 1 1 0000 1100 00000 00000 00000
-			wordIn <= "1100001100000000000000000";
-			rs1 <= (127 downto 64 => '1', others => '0');
-			
-			wait for 10 ns;	
+			-- when sign of the 16-bit field of rs2 is positive, rd of that field is same as that of rs1
+			-- Expected Rd = "8000 0000 0000 0000 0000 0000 0000 FFFF"
+			wordIn <= "1100001010000000000000000";
+			rs1 <= X"80000000000F404000000000000F4240";	 --
+			rs2 <= X"10000000000000000000000000000001";
+			wait for 10 ns;
 			
 			--Testing for ROTW
 			--Set the first 32 bits of rs1 to 1, then others to 0  
@@ -565,7 +525,65 @@ begin
 			rs2 <= X"0000000400000003000000040000001F";
 			
 			wait for 10 ns;
-					
+			
+			
+            -- Testing the load immediate Function
+            -- wordIn can be something like 0 001 0000 1111 0000 1111 00000
+            -- This will load 0x0F0F into the second 16 bits of register rd
+            wordIn <= "0001000011110000111100000";
+            
+            wait for 10 ns;
+            
+            -- Testing the load immediate Function
+            -- wordIn can be something like 0 010 1100111100101111 00000
+            -- This will load 0xCF2F into the third 16 bits of register rd
+            wordIn <= "0010110011110010111100000"; 
+			
+			wait for 10 ns;		
+			
+			-- Testing the load immediate Function
+            -- wordIn can be something like 0 000 1100000000100011 00000
+            -- This will load 0xC023 into the last 16 bits of register rd
+            wordIn <= "0000010000000010001100000"; 
+			
+			wait for 10 ns;		
+			
+			--Testing for bitwiseOR
+			--Set the first 32 bits of rs1 to 1, then others to 0  
+			--Set the last 32 bits of rs2 to 1, then others to 0 
+			-- wordIn is 1 1 0000 0101 00000 00000 00000
+			wordIn <= "1100000101000000000000000";
+			rs1 <= (127 downto 95 => '1', others => '0');
+			rs2 <= (31 downto 0 => '1', others => '0');  
+			
+			
+			wait for 10 ns;	
+			
+			--Testing for bitwiseAND
+			--Set the first 32 bits of rs1 to 1, then others to 0  
+			--Set the last 32 bits of rs2 to 1, then others to 0 
+			-- wordIn is 1 1 0000 1011 00000 00000 00000
+			wordIn <= "1100001011000000000000000";
+			rs1 <= (127 downto 95 => '1', others => '0');
+			rs2 <= (100 downto 80 => '1', others => '0');
+			
+			wait for 10 ns;
+			
+			--Testing for INVB
+			--Set the rs1 to all F
+			-- wordIn is 1 1 0000 1100 00000 00000 00000
+			wordIn <= "1100001100000000000000000";
+			rs1 <= (127 downto 0 => '1', others => '0');
+			
+			wait for 10 ns;	
+			
+			--Testing for INVB
+			--Set the rs1 to all 0
+			-- wordIn is 1 1 0000 1100 00000 00000 00000
+			wordIn <= "1100001100000000000000000";
+			rs1 <= (others => '0');
+			
+			wait for 10 ns;
 			
 			--Testing for SFWU
 			-- wordIn is 1 1 0000 1110 00000 00000 00000
@@ -580,25 +598,13 @@ begin
 			--Testing edge case for SFWU
 			--Set last set of rs2 to 0x0000_0005, which is dec 5
 			--Set last set of rs1 to 0x0000_0007, which is dec 7
+			--Answer should be placed in last 32 bits of rd
 			--Answer is negative when done in decimal.
-			--Answer is should underflow to FFFF_FFFE
-			
-			--3rd
-			--Set last set of rs2 to 0xFFFF_FFFF, which is dec 4,294,967,295
-			--Set last set of rs1 to 0x0000_1CF3, which is dec 7,411
-			--Answer is negative when done in decimal.
-			--Answer is should underflow to FFFF_E30C
-			
-			--1st
-			--Testing edge case for SFWU
-			--Set last set of rs2 to 0x1000_0000, which is dec 16,777,216
-			--Set last set of rs1 to 0x0100_0000, which is dec 268,435,456
-			--Answer should be placed in last 32 bits of rd.
-			--Answer is 0x0F00_0000, or 251,658,240
+			--Answer is unknown right now.
 			
 			wordIn <= "1100001110000000000000000";
-			rs1 <= X"0100000000001CF30000000700000002";
-			rs2 <= X"10000000FFFFFFFF0000000500000005";  
+			rs1 <= X"00000000000000000000000700000002";
+			rs2 <= X"00000000000000000000000500000005";  
 			
 			wait for 10 ns;
 			
