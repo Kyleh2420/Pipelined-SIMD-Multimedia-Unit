@@ -530,9 +530,24 @@ begin
 		
 			--DONE Testing for 1001 MLHU - multiply low unsigned
 			-- wordIn is 1 1 0000 1001 00000 00000 00000
+			
+			--0th
+			--3*3 = 9
+			
+			--1st
+			--104 * 2 = 208 [Hex]
+			--260 * 2 = 520 [Dec]
+			
+			--2nd
+			--4040 * FFFF =	1043F3BBFC0	     [Hex]
+			--16448 * 65535 = 1,077,919,680  [Dec]
+			
+			--3rd
+			--FFFF * 0001 = FFFF [Hex]
+			--65535 * 1 = 65535  [Dec]
 			wordIn <= "1100001001000000000000000";
-			rs1 <= X"FF00FFFF000F40400000010400000003";	 --
-			rs2 <= X"11000001000000000000000200000003";
+			rs1 <= X"FF00FFFF000F40400000010400000003";
+			rs2 <= X"110000010000FFFF0000000200000003";
 			wait for 10 ns;	
 			
 			--Testing for 1010 MLHSS - multiply by sign saturated
