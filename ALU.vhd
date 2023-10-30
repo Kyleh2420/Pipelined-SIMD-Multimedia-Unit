@@ -937,55 +937,58 @@ architecture Behavioral of ALU is
 		variable offset: integer;
 		variable shift: integer := 0;
 	begin
-		shift := to_integer(unsigned(rs2(3 downto 0) ));   -- if need to shift n times
+		shift := to_integer(unsigned(r2(3 downto 0) ));   -- if need to shift n times
 
 		-- 0th half word
 		hwIndex := 0;
-		offset := (hwIndex*16);
-		rd(15-shift+offset downto offset) <= rs1(offset+15 downto offset+shift);
-		rd(offset-1 downto offset+16-shift) <= (others => '0');
+		offset := (hwIndex*16);  
+		--rd(15-shift+offset downto offset) <= r1(offset+15 downto offset+shift);
+		--rd(offset-1 downto offset+16-shift) <= (others => '0');
+		rd(15-shift+offset downto offset) <= r1(offset+15 downto offset+shift);
+		rd(offset+15 downto offset+16-shift) <= (others => '0');
+		
 		
 		-- 1st half word
 		hwIndex := 1;
 		offset := (hwIndex*16);
-		rd(15-shift+offset downto offset) <= rs1(offset+15 downto offset+shift);
-		rd(offset-1 downto offset+16-shift) <= (others => '0');
+		rd(15-shift+offset downto offset) <= r1(offset+15 downto offset+shift);
+		rd(offset+15 downto offset+16-shift) <= (others => '0');
 		
 		-- 2nd half word
 		hwIndex := 2;
 		offset := (hwIndex*16);
-		rd(15-shift+offset downto offset) <= rs1(offset+15 downto offset+shift);
-		rd(offset-1 downto offset+16-shift) <= (others => '0');
+		rd(15-shift+offset downto offset) <= r1(offset+15 downto offset+shift);
+		rd(offset+15 downto offset+16-shift) <= (others => '0');
 		
 		-- 3rd half word
 		hwIndex := 3;
 		offset := (hwIndex*16);
-		rd(15-shift+offset downto offset) <= rs1(offset+15 downto offset+shift);
-		rd(offset-1 downto offset+16-shift) <= (others => '0');
+		rd(15-shift+offset downto offset) <= r1(offset+15 downto offset+shift);
+		rd(offset+15 downto offset+16-shift) <= (others => '0');
 		
 		-- 4th half word
 		hwIndex := 4;
 		offset := (hwIndex*16);
-		rd(15-shift+offset downto offset) <= rs1(offset+15 downto offset+shift);
-		rd(offset-1 downto offset+16-shift) <= (others => '0');
+		rd(15-shift+offset downto offset) <= r1(offset+15 downto offset+shift);
+		rd(offset+15 downto offset+16-shift) <= (others => '0');
 		
 		-- 5th half word
 		hwIndex := 5;
 		offset := (hwIndex*16);
-		rd(15-shift+offset downto offset) <= rs1(offset+15 downto offset+shift);
-		rd(offset-1 downto offset+16-shift) <= (others => '0');
+		rd(15-shift+offset downto offset) <= r1(offset+15 downto offset+shift);
+		rd(offset+15 downto offset+16-shift) <= (others => '0');
 		
 		-- 6th half word
 		hwIndex := 6;
 		offset := (hwIndex*16);
-		rd(15-shift+offset downto offset) <= rs1(offset+15 downto offset+shift);
-		rd(offset-1 downto offset+16-shift) <= (others => '0');
+		rd(15-shift+offset downto offset) <= r1(offset+15 downto offset+shift);
+		rd(offset+15 downto offset+16-shift) <= (others => '0');
 		
 		-- 7th half word
 		hwIndex := 7;
 		offset := (hwIndex*16);
-		rd(15-shift+offset downto offset) <= rs1(offset+15 downto offset+shift);
-		rd(offset-1 downto offset+16-shift) <= (others => '0');
+		rd(15-shift+offset downto offset) <= r1(offset+15 downto offset+shift);
+		rd(offset+15 downto offset+16-shift) <= (others => '0');
 		
 	end SHRHI;	
 
@@ -1058,7 +1061,7 @@ architecture Behavioral of ALU is
 		variable val2: signed(wordLength-1 downto 0);
 		variable val1: signed(wordLength-1 downto 0);
 		variable LSB: integer;
-		variable MSB: integer; 
+		variable MSB: integer;  
 	begin
 		--For the 0th index
 		wordIndex := 0;
@@ -1277,7 +1280,7 @@ architecture Behavioral of ALU is
 	end MAXWS;
 		
 
----1000-Procedure to computer MINWS user in R3 instruction type--------------------- to be tested
+---1000-Procedure to computer MINWS used in R3 instruction type--------------------- to be tested
 
 	procedure MINWS(signal r1, r2: in std_logic_vector(registerLength-1 downto 0);
 						signal rd: out std_logic_vector(registerLength-1 downto 0)) is
@@ -1305,7 +1308,7 @@ architecture Behavioral of ALU is
 		LSB := registerLength * wordIndex / 4;
 		MSB := LSB + wordLength - 1;
 		int1 := signed(r1(MSB downto LSB));
-		int2 :=	signed(r2(MSB downto LSB));
+		int2 :=signed(r2(MSB downto LSB));
 		if (int1 > int2) then
 			rd(MSB downto LSB) <= std_logic_vector(int2);
 		else
@@ -1317,7 +1320,7 @@ architecture Behavioral of ALU is
 		LSB := registerLength * wordIndex / 4;	  --64
 		MSB := LSB + wordLength - 1;			  --95
 		int1 := signed(r1(MSB downto LSB));
-		int2 :=	signed(r2(MSB downto LSB));
+		int2 := signed(r2(MSB downto LSB));
 		if (int1 > int2) then
 			rd(MSB downto LSB) <= std_logic_vector(int2);
 		else
@@ -1329,8 +1332,8 @@ architecture Behavioral of ALU is
 		LSB := registerLength * wordIndex / 4;
 		MSB := LSB + wordLength - 1;
 		int1 := signed(r1(MSB downto LSB));
-		int2 :=	signed(r2(MSB downto LSB));
-		if (int1 < int2) then
+		int2 := signed(r2(MSB downto LSB));
+		if (int1 > int2) then
 			rd(MSB downto LSB) <= std_logic_vector(int2); --put max value of the word into corresponding spot in rd
 		else
 			rd(MSB downto LSB) <= std_logic_vector(int1);
@@ -1686,7 +1689,7 @@ begin
         --Figure out what opcode the R3 instruction type is telling us to do.
         case wordIn(18 downto 15) is
             when "0000" => null;
-            when "0001" => selectOpcode <= SHRHI;
+            when "0001" => SHRHI(rs1, rs2, rd);
             when "0010" => AU(rs1, rs2, rd);
             when "0011" =>
 			--for CNT1H
