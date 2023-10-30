@@ -1445,20 +1445,55 @@ architecture Behavioral of ALU is
 		int1 := unsigned(r1(maxBit downto minBit));
 		int2 :=	unsigned(r2(maxBit downto minBit));
 		
+		
+		rd(maxBit downto minBit) <=  std_logic_vector(int2 - int1);
+		
 		--This is what I thought of at first
-		--rd(maxBit downto minBit) <=  std_logic_vector(int2 - int1);
+		--Personally, this is what I believe this function should operate like. However, the TA has said differently.
+--		if (int1 < int2) then
+--			rd(maxBit downto minBit) <=  std_logic_vector(int2 - int1);
+--		elsif (int1 > int2) then
+--			rd(maxBit downto minBit) <=  std_logic_vector(int1 - int2);
+--		else
+--			rd(maxBit downto minBit) <= (others => '0');
+--		end if;	
+		
 		--Turns out VHDL does the subtraction as a twos compliment, but interpets the result as unsigned
 		--So 5-7 = 14 (0101 - 0111 = 1110), which makes sense as twos compliment in binary
 		--However, I don't believe that's what the essence of this instruction is. Therefore, I am
 		--programing this to simply find the difference between the two values.
 		
-		if (int1 < int2) then
-			rd(maxBit downto minBit) <=  std_logic_vector(int2 - int1);
-		elsif (int1 > int2) then
-			rd(maxBit downto minBit) <=  std_logic_vector(int1 - int2);
-		else
-			rd(maxBit downto minBit) <= (others => '0');
-		end if;
+		wordIndex := 1;	
+		maxBit := ( (wordIndex+1) * registerLength / 4) - 1;
+		minBit := ( (wordIndex) * registerLength / 4);
+		
+		int1 := unsigned(r1(maxBit downto minBit));
+		int2 :=	unsigned(r2(maxBit downto minBit));
+		
+		
+		rd(maxBit downto minBit) <=  std_logic_vector(int2 - int1);
+		
+		wordIndex := 2;	
+		maxBit := ( (wordIndex+1) * registerLength / 4) - 1;
+		minBit := ( (wordIndex) * registerLength / 4);
+		
+		int1 := unsigned(r1(maxBit downto minBit));
+		int2 :=	unsigned(r2(maxBit downto minBit));
+		
+		
+		rd(maxBit downto minBit) <=  std_logic_vector(int2 - int1);
+		
+		wordIndex := 3;	
+		maxBit := ( (wordIndex+1) * registerLength / 4) - 1;
+		minBit := ( (wordIndex) * registerLength / 4);
+		
+		int1 := unsigned(r1(maxBit downto minBit));
+		int2 :=	unsigned(r2(maxBit downto minBit));
+		
+		
+		rd(maxBit downto minBit) <=  std_logic_vector(int2 - int1);
+		
+		
     end SFWU;
 -----------------------------------------------------------------------------------
 
