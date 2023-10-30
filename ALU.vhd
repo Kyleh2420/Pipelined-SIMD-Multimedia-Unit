@@ -1061,7 +1061,7 @@ architecture Behavioral of ALU is
 		variable val2: signed(wordLength-1 downto 0);
 		variable val1: signed(wordLength-1 downto 0);
 		variable LSB: integer;
-		variable MSB: integer;  
+		variable MSB: integer;
 	begin
 		--For the 0th index
 		wordIndex := 0;
@@ -1070,7 +1070,7 @@ architecture Behavioral of ALU is
 		
 		val2 := signed ( r2( MSB downto LSB));
 		val1 := signed ( r1( MSB downto LSB));
-		result( wordLength-1 downto 0) := val2 - val1;
+		result( wordLength-1 downto 0) := val2 + val1;
 		
 		if (saturationCheckAdd( std_logic_vector(val1(15 downto 15)), std_logic_vector(val2(15 downto 15)), std_logic_vector(result(15 downto 15)) ) = 1) then
 			result(wordLength-1 downto 0) := (others => result(wordLength-1));
@@ -1087,7 +1087,7 @@ architecture Behavioral of ALU is
 		
 		val2 := signed ( r2( MSB downto LSB));
 		val1 := signed ( r1( MSB downto LSB));
-		result( wordLength-1 downto 0) := val2 - val1;
+		result( wordLength-1 downto 0) := val2 + val1;
 		
 		if (saturationCheckAdd( std_logic_vector(val1(wordLength-1 downto wordLength-1)), std_logic_vector(val2(wordLength-1 downto wordLength-1)), std_logic_vector(result(wordLength-1 downto wordLength-1)) ) = 1) then
 			result(wordLength-1 downto 0) := (others => result(wordLength-1));
@@ -1103,7 +1103,7 @@ architecture Behavioral of ALU is
 		
 		val2 := signed ( r2( MSB downto LSB));
 		val1 := signed ( r1( MSB downto LSB));
-		result( wordLength-1 downto 0) := val2 - val1;
+		result( wordLength-1 downto 0) := val2 + val1;
 		
 		if (saturationCheckAdd( std_logic_vector(val1(wordLength-1 downto wordLength-1)), std_logic_vector(val2(wordLength-1 downto wordLength-1)), std_logic_vector(result(wordLength-1 downto wordLength-1)) ) = 1) then
 			result(wordLength-1 downto 0) := (others => result(wordLength-1));
@@ -1119,7 +1119,7 @@ architecture Behavioral of ALU is
 		
 		val2 := signed ( r2( MSB downto LSB));
 		val1 := signed ( r1( MSB downto LSB));
-		result( wordLength-1 downto 0) := val2 - val1;
+		result( wordLength-1 downto 0) := val2 + val1;
 		
 		if (saturationCheckAdd( std_logic_vector(val1(wordLength-1 downto wordLength-1)), std_logic_vector(val2(wordLength-1 downto wordLength-1)), std_logic_vector(result(wordLength-1 downto wordLength-1)) ) = 1) then
 			result(wordLength-1 downto 0) := (others => result(wordLength-1));
@@ -1135,7 +1135,7 @@ architecture Behavioral of ALU is
 		
 		val2 := signed ( r2( MSB downto LSB));
 		val1 := signed ( r1( MSB downto LSB));
-		result( wordLength-1 downto 0) := val2 - val1;
+		result( wordLength-1 downto 0) := val2 + val1;
 		
 		if (saturationCheckAdd( std_logic_vector(val1(wordLength-1 downto wordLength-1)), std_logic_vector(val2(wordLength-1 downto wordLength-1)), std_logic_vector(result(wordLength-1 downto wordLength-1)) ) = 1) then
 			result(wordLength-1 downto 0) := (others => result(wordLength-1));
@@ -1151,7 +1151,7 @@ architecture Behavioral of ALU is
 		
 		val2 := signed ( r2( MSB downto LSB));
 		val1 := signed ( r1( MSB downto LSB));
-		result( wordLength-1 downto 0) := val2 - val1;
+		result( wordLength-1 downto 0) := val2 + val1;
 		
 		if (saturationCheckAdd( std_logic_vector(val1(wordLength-1 downto wordLength-1)), std_logic_vector(val2(wordLength-1 downto wordLength-1)), std_logic_vector(result(wordLength-1 downto wordLength-1)) ) = 1) then
 			result(wordLength-1 downto 0) := (others => result(wordLength-1));
@@ -1167,7 +1167,7 @@ architecture Behavioral of ALU is
 		
 		val2 := signed ( r2( MSB downto LSB));
 		val1 := signed ( r1( MSB downto LSB));
-		result( wordLength-1 downto 0) := val2 - val1;
+		result( wordLength-1 downto 0) := val2 + val1;
 		
 		if (saturationCheckAdd( std_logic_vector(val1(wordLength-1 downto wordLength-1)), std_logic_vector(val2(wordLength-1 downto wordLength-1)), std_logic_vector(result(wordLength-1 downto wordLength-1)) ) = 1) then
 			result(wordLength-1 downto 0) := (others => result(wordLength-1));
@@ -1183,7 +1183,7 @@ architecture Behavioral of ALU is
 		
 		val2 := signed ( r2( MSB downto LSB));
 		val1 := signed ( r1( MSB downto LSB));
-		result( wordLength-1 downto 0) := val2 - val1;
+		result( wordLength-1 downto 0) := val2 + val1;
 		
 		if (saturationCheckAdd( std_logic_vector(val1(wordLength-1 downto wordLength-1)), std_logic_vector(val2(wordLength-1 downto wordLength-1)), std_logic_vector(result(wordLength-1 downto wordLength-1)) ) = 1) then
 			result(wordLength-1 downto 0) := (others => result(wordLength-1));

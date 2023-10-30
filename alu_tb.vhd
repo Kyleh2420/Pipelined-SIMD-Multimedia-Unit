@@ -443,10 +443,16 @@ begin
 			
 			--???? Testing for 0100 AHS - add halfword saturated
 			-- wordIn is 1 1 0000 0100 00000 00000 00000
+			-- Normal operation of simply adding
+			wordIn <= "1100000100000000000000000";						 
+			rs1 <= X"100000000000000000000000123F0000";
+			rs2 <= X"C0000000000000000000000012300000";
+			wait for 10 ns;
+			
 			-- undersaturated Expect rd = "F000 0000 0000 0000 0000 0000 0000 0000"		
 			wordIn <= "1100000100000000000000000";						 
-			rs1 <= X"F00000000000000000000000000F0000";
-			rs2 <= X"F0000000000000000000000000000000";
+			rs1 <= X"F00000000000000000000000000FF000";
+			rs2 <= X"F000000000000000000000000000F000";
 			wait for 10 ns;
 			
 			-- ??? oversaturated rd = "0FFF FFFF FFFF FFFF FFFF FFFF FFFF FFFF"
