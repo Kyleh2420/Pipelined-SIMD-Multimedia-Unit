@@ -1045,8 +1045,8 @@ architecture Behavioral of ALU is
 
 
 ---0011-Procedure to computer CNT1H in R3 instruction type--------------------------
---- may be implemented in for loop later in process(all) section
-	--to be tested			 
+--- to be implemented in for loop later in process(all) section
+	--tested			 
 	
 -------------------------------------------------------------------------------------
 
@@ -1340,7 +1340,135 @@ architecture Behavioral of ALU is
 		end if;
 	 
 	end MINWS;
+------------------------------------------------------------------------------------
 
+---1001-Procedure to compute MLHU multiply low unsigned-----------------------------
+	procedure MLHU(signal r1, r2: in std_logic_vector(registerLength-1 downto 0);
+		signal rd: out std_logic_vector(registerLength-1 downto 0)) is
+		variable wordIndex: integer := 0;
+		variable wordLength: integer := 32;
+		variable mul1: unsigned((registerLength / 8) - 1 downto 0);		--32
+		variable mul2: unsigned((registerLength / 8) - 1 downto 0);
+		variable LSB: integer;
+		variable MSB: integer;
+	begin
+		-- 0th word
+		wordIndex := 0; 
+		LSB := 32 * wordIndex;
+		MSB := LSB + wordLength - 1;
+		mul1 := unsigned(r1((MSB-16) downto LSB));
+		mul2 := unsigned(r2((MSB-16) downto LSB));
+		rd(MSB downto LSB) <= std_logic_vector(mul1 * mul2);
+		
+		-- 1st word
+		wordIndex := 1; 
+		LSB := 32 * wordIndex;
+		MSB := LSB + wordLength - 1;
+		mul1 := unsigned(r1((MSB-16) downto LSB));
+		mul2 := unsigned(r2((MSB-16) downto LSB));
+		rd(MSB downto LSB) <= std_logic_vector(mul1 * mul2);
+		
+		-- 2nd word
+		wordIndex := 2; 
+		LSB := 32 * wordIndex;
+		MSB := LSB + wordLength - 1;
+		mul1 := unsigned(r1((MSB-16) downto LSB));
+		mul2 := unsigned(r2((MSB-16) downto LSB));
+		rd(MSB downto LSB) <= std_logic_vector(mul1 * mul2);
+		
+		-- 3rd word
+		wordIndex := 3; 
+		LSB := 32 * wordIndex;
+		MSB := LSB + wordLength - 1;
+		mul1 := unsigned(r1((MSB-16) downto LSB));
+		mul2 := unsigned(r2((MSB-16) downto LSB));
+		rd(MSB downto LSB) <= std_logic_vector(mul1 * mul2);
+				
+	end MLHU;
+
+------------------------------------------------------------------------------------
+
+---1010-Procedure to computer MLHSS multiply by sign saturated----------------------
+	procedure MLHSS(signal r1, r2: in std_logic_vector(registerLength-1 downto 0);
+		signal rd: out std_logic_vector(registerLength-1 downto 0)) is
+		variable wordIndex: integer := 0;
+		variable wordLength: integer := 32;
+		variable mul1: unsigned((registerLength / 8) - 1 downto 0);		--32
+		variable mul2: unsigned((registerLength / 8) - 1 downto 0);
+		variable LSB: integer;
+		variable MSB: integer;
+	begin
+		-- 0th halfword
+		wordIndex := 0;
+		LSB := 16 * wordIndex;
+		MSB := LSB + 15;
+		mul1 := unsigned(r1(MSB downto LSB));
+		mul2 := unsigned(r2(MSB downto LSB));
+		if to_integer(mul2) = 0 then
+			rd(MSB downto LSB) <= (others => '0');
+		elsif to_integer(mul2(MSB downto MSB)) = 1 then
+			rd(MSB downto LSB) <= std_logic_vector( (not mul1) + 1);
+		else
+			rd(MSB downto LSB) <= std_logic_vector(mul1);
+		end if;		
+		
+		-- 1st halfword
+		wordIndex := 1; 
+		LSB := 16 * wordIndex;
+		MSB := LSB + 15;
+		mul1 := unsigned(r1(MSB downto LSB));
+		mul2 := unsigned(r2(MSB downto LSB));
+		if to_integer(mul2) = 0 then
+			rd(MSB downto LSB) <= (others => '0');
+		elsif to_integer(mul2(MSB downto MSB)) = 1 then
+			rd(MSB downto LSB) <= std_logic_vector( (not mul1) + 1);
+		else
+			rd(MSB downto LSB) <= std_logic_vector(mul1);
+		end if;
+		
+		-- 2nd halfword
+		wordIndex := 2; 
+		LSB := 32 * wordIndex;
+		MSB := LSB + wordLength - 1;
+		mul1 := unsigned(r1((MSB-16) downto LSB));
+		mul2 := unsigned(r2((MSB-16) downto LSB));
+		if to_integer(mul2) = 0 then
+			rd(MSB downto LSB) <= (others => '0');
+		elsif to_integer(mul2(MSB downto MSB)) = 1 then
+			rd(MSB downto LSB) <= std_logic_vector( (not mul1) + 1);
+		else
+			rd(MSB downto LSB) <= std_logic_vector(mul1);
+		end if;
+		
+		-- 3rd halfword
+		wordIndex := 3; 
+		LSB := 32 * wordIndex;
+		MSB := LSB + wordLength - 1;
+		mul1 := unsigned(r1((MSB-16) downto LSB));
+		mul2 := unsigned(r2((MSB-16) downto LSB));
+		if to_integer(mul2) = 0 then
+			rd(MSB downto LSB) <= (others => '0');
+		elsif to_integer(mul2(MSB downto MSB)) = 1 then
+			rd(MSB downto LSB) <= std_logic_vector( (not mul1) + 1);
+		else
+			rd(MSB downto LSB) <= std_logic_vector(mul1);
+		end if;
+		
+		-- 4th halfword
+		
+		
+		-- 5th halfword
+		
+
+		-- 6th halfword
+		
+
+		-- 7th halfword
+
+	
+	
+	end MLHSS;	
+	
 ---1011-Procedure to compute the bitwiseAND used in R3 instruction type-------------
 
     procedure bitwiseAND(signal r1, r2: in std_logic_vector(registerLength-1 downto 0);
@@ -1448,55 +1576,20 @@ architecture Behavioral of ALU is
 		int1 := unsigned(r1(maxBit downto minBit));
 		int2 :=	unsigned(r2(maxBit downto minBit));
 		
-		
-		rd(maxBit downto minBit) <=  std_logic_vector(int2 - int1);
-		
 		--This is what I thought of at first
-		--Personally, this is what I believe this function should operate like. However, the TA has said differently.
---		if (int1 < int2) then
---			rd(maxBit downto minBit) <=  std_logic_vector(int2 - int1);
---		elsif (int1 > int2) then
---			rd(maxBit downto minBit) <=  std_logic_vector(int1 - int2);
---		else
---			rd(maxBit downto minBit) <= (others => '0');
---		end if;	
-		
+		--rd(maxBit downto minBit) <=  std_logic_vector(int2 - int1);
 		--Turns out VHDL does the subtraction as a twos compliment, but interpets the result as unsigned
 		--So 5-7 = 14 (0101 - 0111 = 1110), which makes sense as twos compliment in binary
 		--However, I don't believe that's what the essence of this instruction is. Therefore, I am
 		--programing this to simply find the difference between the two values.
 		
-		wordIndex := 1;	
-		maxBit := ( (wordIndex+1) * registerLength / 4) - 1;
-		minBit := ( (wordIndex) * registerLength / 4);
-		
-		int1 := unsigned(r1(maxBit downto minBit));
-		int2 :=	unsigned(r2(maxBit downto minBit));
-		
-		
-		rd(maxBit downto minBit) <=  std_logic_vector(int2 - int1);
-		
-		wordIndex := 2;	
-		maxBit := ( (wordIndex+1) * registerLength / 4) - 1;
-		minBit := ( (wordIndex) * registerLength / 4);
-		
-		int1 := unsigned(r1(maxBit downto minBit));
-		int2 :=	unsigned(r2(maxBit downto minBit));
-		
-		
-		rd(maxBit downto minBit) <=  std_logic_vector(int2 - int1);
-		
-		wordIndex := 3;	
-		maxBit := ( (wordIndex+1) * registerLength / 4) - 1;
-		minBit := ( (wordIndex) * registerLength / 4);
-		
-		int1 := unsigned(r1(maxBit downto minBit));
-		int2 :=	unsigned(r2(maxBit downto minBit));
-		
-		
-		rd(maxBit downto minBit) <=  std_logic_vector(int2 - int1);
-		
-		
+		if (int1 < int2) then
+			rd(maxBit downto minBit) <=  std_logic_vector(int2 - int1);
+		elsif (int1 > int2) then
+			rd(maxBit downto minBit) <=  std_logic_vector(int1 - int2);
+		else
+			rd(maxBit downto minBit) <= (others => '0');
+		end if;
     end SFWU;
 -----------------------------------------------------------------------------------
 
@@ -1748,8 +1841,8 @@ begin
             when "0110" => BCW(rs1, rs2, rd);
             when "0111" => MAXWS(rs1, rs2, rd);
             when "1000" => MINWS(rs1, rs2, rd);
-            when "1001" => selectOpcode <= MLHU;
-            when "1010" => selectOpcode <= MLHSS;
+            when "1001" => MLHU(rs1, rs2, rd);
+            when "1010" => MLHSS(rs1, rs2, rd);
             when "1011" => bitwiseAND(rs1, rs2, rd);
             when "1100" => INVB(rs1, rs2, rd);
             when "1101" => ROTW(rs1, rs2, rd);
