@@ -1,0 +1,39 @@
+                                        Rules to note
+---------------------------------------------------------------------------------------------
+1. Instruction arguments should be seperated using only spaces.
+2. There should always be a \n [Newline character] at the end of each instruction (That means the last one too)
+3. Registers are to be written with a [r] prepending the register number.
+4. Immediate values are to be written in hex with 0x prepending the immediate value.
+
+
+li [0-7] 0xFFFF r[0-31]                   li {Load Index} {16-bit Imm} {Destination Register}
+
+                                    R4 Instructions
+---------------------------------------------------------------------------------------------
+simal r[0-31] r[0-31] r[0-31] r[0-31]    simal {rs3} {rs2} {rs1} {Destination Register}
+simah r[0-31] r[0-31] r[0-31] r[0-31]    simah {rs3} {rs2} {rs1} {Destination Register}
+simsl r[0-31] r[0-31] r[0-31] r[0-31]    simsl {rs3} {rs2} {rs1} {Destination Register}
+simsh r[0-31] r[0-31] r[0-31] r[0-31]    simsh {rs3} {rs2} {rs1} {Destination Register}
+slmal r[0-31] r[0-31] r[0-31] r[0-31]    slmal {rs3} {rs2} {rs1} {Destination Register}
+slmah r[0-31] r[0-31] r[0-31] r[0-31]    slmah {rs3} {rs2} {rs1} {Destination Register}
+slmsl r[0-31] r[0-31] r[0-31] r[0-31]    slmsl {rs3} {rs2} {rs1} {Destination Register}
+slmsh r[0-31] r[0-31] r[0-31] r[0-31]    slmsh {rs3} {rs2} {rs1} {Destination Register}
+
+                                    R3 Instructions
+---------------------------------------------------------------------------------------------
+nop
+SHRHI
+AU
+CNT1H
+AHS
+OR
+CBCW
+MAXWS
+MINWS
+MLHU
+MLHSS
+AND
+INVB
+ROTW
+SFWU
+SFHS
