@@ -3,18 +3,56 @@
 #include <string.h>
 #include <ctype.h>
 
-//This function will take a decimal character string and return a 5 bit binary value
-//Ex: Input 7 --> 00111
-//Ex: Input 31 --> 11111
-char* dec2Bin(char* charInput) {
-
+void removeChar(char *str, char c) {
+    int i, j;
+    int len = strlen(str);
+    for (i = j = 0; i < len; i++) {
+        if (str[i] != c) {
+            str[j++] = str[i];
+        }
+    }
+    str[j] = '\0';
 }
 
-//This function will take a hex character string and return a 16 bit binary value
+void slice(const char* str, char* result, size_t start, size_t end) {
+    strncpy(result, str + start, end - start);
+}
+//This function will convert a long to a character array of a binary equivalent
+char* long_to_binary(unsigned long k)
+
+{
+        static char c[65];
+        c[0] = '\0';
+
+        unsigned long val;
+        for (val = 1UL << (sizeof(unsigned long)*8-1); val > 0; val >>= 1) {   
+            strcat(c, ((k & val) == val) ? "1" : "0");
+        }
+        return c;
+    }
+
+//This function will take a base m character string and return a n bit binary value
+//Ex: Input 7 --> 00111
+//Ex: Input 31 --> 11111
 //Ex: Input FFFF --> 1111111111111111
 //Ex: Input 0000 --> 0000000000000000
-char* hex2Bin(char* charInput) {
+char* char2Bin(char* charInput, int n, int m) {
+    char* pEnd;
+    char* binaryValue;
 
+    //Convert the given string to a long
+    long int li1 = strtol(charInput, &pEnd, m);
+
+    //Convert the long to a binary encoded string
+    pEnd = long_to_binary(li1);
+
+    //Limit to n bits
+    //For some reason, when I copy-paste strlen(pEnd)-5 directly into the slice parameter, I get a segmentation fault
+    int tmp = strlen(pEnd)-n;
+    slice(pEnd, binaryValue, tmp, strlen(pEnd));
+    binaryValue[n] = '\0';
+
+    return binaryValue;
 }
 
 int main() {
@@ -37,6 +75,9 @@ int main() {
         int currentArg = 0;
 
         printf("\n%s", line);
+        //Remove the commas and the rs (which stand for registers)
+        removeChar(line, 'r');
+        removeChar(line, ',');
 
         //Going char by char in the line, we will also parse out the arguements to put in the 2d array args
         for (int i = 0; line[i]; i++) {
@@ -57,7 +98,7 @@ int main() {
         }
         //Arguments have been seperated by spaces
 /*
-        //Print all arguements
+        //Print all arguments
         for (int i = 0; i < 5; i++) {
             printf("\n%d: %s", i, args[i]);
         }
@@ -67,8 +108,10 @@ int main() {
         //If this was a more complicated assembler, the smarter way would be a hashmap
         if(strcmp(args[0], "li") == 0) {
             printf("\nFound LI");
-            
-            
+            strcat(opcodeOut, "0");
+            strcat(opcodeOut, char2Bin(args[1], 3, 10));
+            strcat(opcodeOut, char2Bin(args[2], 16, 16));
+            strcat(opcodeOut, char2Bin(args[3], 5, 10));
         } else if (strcmp(args[0], "simal") == 0){
             //Do Something
         } else if (strcmp(args[0], "simah") == 0){
@@ -122,7 +165,9 @@ int main() {
             printf("\nInstruction not found: %s", args[0]);
         }
 
+        printf("\nOpcode: %s", opcodeOut);
         fprintf(outputFile, opcodeOut);
+        fprintf(outputFile, "\n");
         lineIndex++;
     }
     fclose(inputFile);

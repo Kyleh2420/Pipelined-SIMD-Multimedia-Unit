@@ -1,3 +1,2 @@
-li 7 0xFFFF r31
-and r15 r16 r17
-bleh
+li r1, 7, 0x0002
+li r31, 1, 0xFFFF
