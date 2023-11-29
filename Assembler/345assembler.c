@@ -3,6 +3,8 @@
 #include <string.h>
 #include <ctype.h>
 
+
+
 void removeChar(char *str, char c) {
     int i, j;
     int len = strlen(str);
@@ -38,7 +40,9 @@ char* long_to_binary(unsigned long k)
 //Ex: Input 0000 --> 0000000000000000
 char* char2Bin(char* charInput, int n, int m) {
     char* pEnd;
-    char* binaryValue;
+
+    //Technically I malloc here but never free.. I don't know where to, since it'll return the address and immedeately get used.
+    char* binaryValue = malloc (sizeof(char)*n);
 
     //Convert the given string to a long
     long int li1 = strtol(charInput, &pEnd, m);
@@ -76,7 +80,6 @@ int main() {
 
         printf("\n%s", line);
         //Remove the commas and the rs (which stand for registers)
-        removeChar(line, 'r');
         removeChar(line, ',');
 
         //Going char by char in the line, we will also parse out the arguements to put in the 2d array args
@@ -97,70 +100,208 @@ int main() {
             }
         }
         //Arguments have been seperated by spaces
-/*
-        //Print all arguments
-        for (int i = 0; i < 5; i++) {
-            printf("\n%d: %s", i, args[i]);
+
+        //Remove the r (Which stands for registers) from every arguement beyond arg[0]
+        for (int i = 1; i < 5; i++) {
+            removeChar(args[i], 'r');
         }
-*/
         //There's probably a better way to do this. I can think of one: A hashmap and a switch statement.
         //However, since this is a simple instructionset with minimal instructions, I have elected to use a if-else ladder
         //If this was a more complicated assembler, the smarter way would be a hashmap
         if(strcmp(args[0], "li") == 0) {
-            printf("\nFound LI");
+            //For some reason, without this printf statement, the program segfaults. THIS IS IMPORTANT
             strcat(opcodeOut, "0");
-            strcat(opcodeOut, char2Bin(args[1], 3, 10));
-            strcat(opcodeOut, char2Bin(args[2], 16, 16));
-            strcat(opcodeOut, char2Bin(args[3], 5, 10));
+            strcat(opcodeOut, char2Bin(args[2], 3, 10));
+            strcat(opcodeOut, char2Bin(args[3], 16, 16));
+            strcat(opcodeOut, char2Bin(args[1], 5, 10));
         } else if (strcmp(args[0], "simal") == 0){
             //Do Something
+            strcat(opcodeOut, "10");
+            strcat(opcodeOut, "000");
+            strcat(opcodeOut, char2Bin(args[4], 5, 10));
+            strcat(opcodeOut, char2Bin(args[3], 5, 10));
+            strcat(opcodeOut, char2Bin(args[2], 5, 10));
+            strcat(opcodeOut, char2Bin(args[1], 5, 10));
         } else if (strcmp(args[0], "simah") == 0){
             //Do Something
+            strcat(opcodeOut, "10");
+            strcat(opcodeOut, "001");
+            strcat(opcodeOut, char2Bin(args[4], 5, 10));
+            strcat(opcodeOut, char2Bin(args[3], 5, 10));
+            strcat(opcodeOut, char2Bin(args[2], 5, 10));
+            strcat(opcodeOut, char2Bin(args[1], 5, 10));
         } else if (strcmp(args[0], "simsl") == 0){
             //Do Something
+            strcat(opcodeOut, "10");
+            strcat(opcodeOut, "010");
+            strcat(opcodeOut, char2Bin(args[4], 5, 10));
+            strcat(opcodeOut, char2Bin(args[3], 5, 10));
+            strcat(opcodeOut, char2Bin(args[2], 5, 10));
+            strcat(opcodeOut, char2Bin(args[1], 5, 10));
         } else if (strcmp(args[0], "simsh") == 0){
             //Do Something
+            strcat(opcodeOut, "10");
+            strcat(opcodeOut, "011");
+            strcat(opcodeOut, char2Bin(args[4], 5, 10));
+            strcat(opcodeOut, char2Bin(args[3], 5, 10));
+            strcat(opcodeOut, char2Bin(args[2], 5, 10));
+            strcat(opcodeOut, char2Bin(args[1], 5, 10));
         } else if (strcmp(args[0], "slmal") == 0){
             //Do Something
+            strcat(opcodeOut, "10");
+            strcat(opcodeOut, "100");
+            strcat(opcodeOut, char2Bin(args[4], 5, 10));
+            strcat(opcodeOut, char2Bin(args[3], 5, 10));
+            strcat(opcodeOut, char2Bin(args[2], 5, 10));
+            strcat(opcodeOut, char2Bin(args[1], 5, 10));
         } else if (strcmp(args[0], "slmah") == 0){
             //Do Something
+            strcat(opcodeOut, "10");
+            strcat(opcodeOut, "101");
+            strcat(opcodeOut, char2Bin(args[4], 5, 10));
+            strcat(opcodeOut, char2Bin(args[3], 5, 10));
+            strcat(opcodeOut, char2Bin(args[2], 5, 10));
+            strcat(opcodeOut, char2Bin(args[1], 5, 10));
         } else if (strcmp(args[0], "slmsl") == 0){
             //Do Something
+            strcat(opcodeOut, "10");
+            strcat(opcodeOut, "110");
+            strcat(opcodeOut, char2Bin(args[4], 5, 10));
+            strcat(opcodeOut, char2Bin(args[3], 5, 10));
+            strcat(opcodeOut, char2Bin(args[2], 5, 10));
+            strcat(opcodeOut, char2Bin(args[1], 5, 10));
         } else if (strcmp(args[0], "slmsh") == 0){
             //Do Something
+            strcat(opcodeOut, "10");
+            strcat(opcodeOut, "111");
+            strcat(opcodeOut, char2Bin(args[4], 5, 10));
+            strcat(opcodeOut, char2Bin(args[3], 5, 10));
+            strcat(opcodeOut, char2Bin(args[2], 5, 10));
+            strcat(opcodeOut, char2Bin(args[1], 5, 10));
         } else if (strcmp(args[0], "nop") == 0){
-            //Do Something
+            strcat(opcodeOut, "11");
+            strcat(opcodeOut, "00000000");
+            strcat(opcodeOut, "00000");
+            strcat(opcodeOut, "00000");
+            strcat(opcodeOut, "00000");
         } else if (strcmp(args[0], "shrhi") == 0){
-            //Do Something
+            strcat(opcodeOut, "11");
+            strcat(opcodeOut, "00000001");
+            strcat(opcodeOut, char2Bin(args[3], 5, 10));
+            strcat(opcodeOut, char2Bin(args[2], 5, 10));
+            strcat(opcodeOut, char2Bin(args[1], 5, 10));
         } else if (strcmp(args[0], "au") == 0){
-            //Do Something
+            strcat(opcodeOut, "11");
+            strcat(opcodeOut, "00000010");
+            strcat(opcodeOut, char2Bin(args[3], 5, 10));
+            strcat(opcodeOut, char2Bin(args[2], 5, 10));
+            strcat(opcodeOut, char2Bin(args[1], 5, 10));
         } else if (strcmp(args[0], "cnt1h") == 0){
             //Do Something
+            strcat(opcodeOut, "11");
+            strcat(opcodeOut, "00000011");
+
+//cnt1h doesn't have 3 registers - only 2. Therefore, replace rs2 with all 0s
+            strcat(opcodeOut, "00000");
+            strcat(opcodeOut, char2Bin(args[2], 5, 10));
+            strcat(opcodeOut, char2Bin(args[1], 5, 10));
         } else if (strcmp(args[0], "ahs") == 0){
             //Do Something
+            strcat(opcodeOut, "11");
+            strcat(opcodeOut, "00000100");
+
+            strcat(opcodeOut, char2Bin(args[3], 5, 10));
+            strcat(opcodeOut, char2Bin(args[2], 5, 10));
+            strcat(opcodeOut, char2Bin(args[1], 5, 10));
         } else if (strcmp(args[0], "or") == 0){
             //Do Something
-        } else if (strcmp(args[0], "cbcw") == 0){
+            strcat(opcodeOut, "11");
+            strcat(opcodeOut, "00000101");
+
+            strcat(opcodeOut, char2Bin(args[3], 5, 10));
+            strcat(opcodeOut, char2Bin(args[2], 5, 10));
+            strcat(opcodeOut, char2Bin(args[1], 5, 10));
+        } else if (strcmp(args[0], "bcw") == 0){
             //Do Something
+            strcat(opcodeOut, "11");
+            strcat(opcodeOut, "00000110");
+
+            //bcw doesn't have 3 registers - only 2. Therefore, replace rs2 with all 0s
+            strcat(opcodeOut, "00000");
+            strcat(opcodeOut, char2Bin(args[2], 5, 10));
+            strcat(opcodeOut, char2Bin(args[1], 5, 10));
         } else if (strcmp(args[0], "maxws") == 0){
             //Do Something
+            strcat(opcodeOut, "11");
+            strcat(opcodeOut, "00000111");
+
+            strcat(opcodeOut, char2Bin(args[3], 5, 10));
+            strcat(opcodeOut, char2Bin(args[2], 5, 10));
+            strcat(opcodeOut, char2Bin(args[1], 5, 10));
         } else if (strcmp(args[0], "minws") == 0){
             //Do Something
+            strcat(opcodeOut, "11");
+            strcat(opcodeOut, "00001000");
+
+            strcat(opcodeOut, char2Bin(args[3], 5, 10));
+            strcat(opcodeOut, char2Bin(args[2], 5, 10));
+            strcat(opcodeOut, char2Bin(args[1], 5, 10));
         } else if (strcmp(args[0], "mlhu") == 0){
             //Do Something
+            strcat(opcodeOut, "11");
+            strcat(opcodeOut, "00001001");
+
+            strcat(opcodeOut, char2Bin(args[3], 5, 10));
+            strcat(opcodeOut, char2Bin(args[2], 5, 10));
+            strcat(opcodeOut, char2Bin(args[1], 5, 10));
         } else if (strcmp(args[0], "mlhss") == 0){
             //Do Something
+            strcat(opcodeOut, "11");
+            strcat(opcodeOut, "00001010");
+
+            strcat(opcodeOut, char2Bin(args[3], 5, 10));
+            strcat(opcodeOut, char2Bin(args[2], 5, 10));
+            strcat(opcodeOut, char2Bin(args[1], 5, 10));
         } else if (strcmp(args[0], "and") == 0){
-            printf("\nFound and");
             //Do Something
+            strcat(opcodeOut, "11");
+            strcat(opcodeOut, "00001011");
+
+            strcat(opcodeOut, char2Bin(args[3], 5, 10));
+            strcat(opcodeOut, char2Bin(args[2], 5, 10));
+            strcat(opcodeOut, char2Bin(args[1], 5, 10));
         } else if (strcmp(args[0], "invb") == 0){
             //Do Something
+            strcat(opcodeOut, "11");
+            strcat(opcodeOut, "00001100");
+
+            strcat(opcodeOut, char2Bin(args[3], 5, 10));
+            strcat(opcodeOut, char2Bin(args[2], 5, 10));
+            strcat(opcodeOut, char2Bin(args[1], 5, 10));
         } else if (strcmp(args[0], "rotw") == 0){
             //Do Something
+            strcat(opcodeOut, "11");
+            strcat(opcodeOut, "00001101");
+
+            strcat(opcodeOut, char2Bin(args[3], 5, 10));
+            strcat(opcodeOut, char2Bin(args[2], 5, 10));
+            strcat(opcodeOut, char2Bin(args[1], 5, 10));
         } else if (strcmp(args[0], "sfwu") == 0){
             //Do Something
+            strcat(opcodeOut, "11");
+            strcat(opcodeOut, "00001110");
+
+            strcat(opcodeOut, char2Bin(args[3], 5, 10));
+            strcat(opcodeOut, char2Bin(args[2], 5, 10));
+            strcat(opcodeOut, char2Bin(args[1], 5, 10));
         } else if (strcmp(args[0], "sfhs") == 0){
             //Do Something
+            strcat(opcodeOut, "11");
+            strcat(opcodeOut, "00001111");
+
+            strcat(opcodeOut, char2Bin(args[3], 5, 10));
+            strcat(opcodeOut, char2Bin(args[2], 5, 10));
+            strcat(opcodeOut, char2Bin(args[1], 5, 10));
         } else {
             printf("\nInstruction not found: %s", args[0]);
         }

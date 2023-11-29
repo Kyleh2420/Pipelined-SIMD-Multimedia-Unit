@@ -11,17 +11,21 @@ li [0-7] 0xFFFF r[0-31]                  li {Destination Register} {Load Index} 
 
                                     R4 Instructions
 ---------------------------------------------------------------------------------------------
-simal r[0-31] r[0-31] r[0-31] r[0-31]    simal {Destination Register} {rs3} {rs2} {rs1} 
-simah r[0-31] r[0-31] r[0-31] r[0-31]    simah {Destination Register} {rs3} {rs2} {rs1}
-simsl r[0-31] r[0-31] r[0-31] r[0-31]    simsl {Destination Register} {rs3} {rs2} {rs1}
-simsh r[0-31] r[0-31] r[0-31] r[0-31]    simsh {Destination Register} {rs3} {rs2} {rs1}
-slmal r[0-31] r[0-31] r[0-31] r[0-31]    slmal {Destination Register} {rs3} {rs2} {rs1}
-slmah r[0-31] r[0-31] r[0-31] r[0-31]    slmah {Destination Register} {rs3} {rs2} {rs1}
-slmsl r[0-31] r[0-31] r[0-31] r[0-31]    slmsl {Destination Register} {rs3} {rs2} {rs1}
-slmsh r[0-31] r[0-31] r[0-31] r[0-31]    slmsh {Destination Register} {rs3} {rs2} {rs1}
+
+Format: simal r[0-31] r[0-31] r[0-31] r[0-31]   simal {Destination Register} {rs1} {rs2} {rs3} 
+
+simal 
+simah
+simsl
+simsh
+slmal
+slmah
+slmsl
+slmsh
 
                                     R3 Instructions
 ---------------------------------------------------------------------------------------------
+Format: AU r[0-31], r[0-31], r[0-31]    AU {Destination Register}, {Register 1}, {Register 2} 
 nop
 SHRHI
 AU
