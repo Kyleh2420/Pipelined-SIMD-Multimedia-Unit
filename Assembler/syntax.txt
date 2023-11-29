@@ -1,0 +1,44 @@
+                                        Rules to note
+---------------------------------------------------------------------------------------------
+1. Instruction arguments should be seperated using spaces. Commas are allowed for human readability.
+2. There should always be a \n [Newline character] at the end of each instruction (That means the last one too)
+3. Registers are to be written with a [r] prepending the register number.
+4. Immediate values are to be written in hex with 0x prepending the immediate value.
+5. Destination registers always come first. The order is shown on the right side of the following document.
+
+
+li [0-7] 0xFFFF r[0-31]                  li {Destination Register} {Load Index} {16-bit Imm} 
+
+                                    R4 Instructions
+---------------------------------------------------------------------------------------------
+
+Format: simal r[0-31] r[0-31] r[0-31] r[0-31]   simal {Destination Register} {rs1} {rs2} {rs3} 
+
+simal 
+simah
+simsl
+simsh
+slmal
+slmah
+slmsl
+slmsh
+
+                                    R3 Instructions
+---------------------------------------------------------------------------------------------
+Format: AU r[0-31], r[0-31], r[0-31]    AU {Destination Register}, {Register 1}, {Register 2} 
+nop
+SHRHI
+AU
+CNT1H
+AHS
+OR
+CBCW
+MAXWS
+MINWS
+MLHU
+MLHSS
+AND
+INVB
+ROTW
+SFWU
+SFHS

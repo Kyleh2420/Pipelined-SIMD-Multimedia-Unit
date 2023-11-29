@@ -1,0 +1,10 @@
+li r1, 7, 0x0002
+li r31, 1, 0x0000
+nop
+shrhi r31, r15, r12
+au r31, r15, r12
+simal r2, r5, r6, r7
+slmsh r2, r5, r6, r7
+slmal r2, r5, r6, r31
+bcw r3, r5
+cnt1h r2, r5
