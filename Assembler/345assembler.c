@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <math.h>
 
 
 
@@ -47,6 +48,13 @@ char* char2Bin(char* charInput, int n, int m) {
     //Convert the given string to a long
     long int li1 = strtol(charInput, &pEnd, m);
 
+    //A little checksum - if the long li1 is greater than the bits that 2**n can hold, throw a warning in the console.
+    if (li1 > pow(2, n) - 1) {
+        printf("Error: %li cannot fit within a %d-bit binary", li1, n);
+        printf("\nExiting with error");
+        exit(1);
+    }
+
     //Convert the long to a binary encoded string
     pEnd = long_to_binary(li1);
 
@@ -61,10 +69,10 @@ char* char2Bin(char* charInput, int n, int m) {
 
 int main() {
     //Open a inputFile called "input.txt" in read only mode
-    FILE* inputFile = fopen("input.txt", "r"); 
+    FILE* inputFile = fopen("assembly.txt", "r"); 
 
     //Open an outputFile called "output.txt" in write only mode
-    FILE* outputFile = fopen("output.txt", "w"); 
+    FILE* outputFile = fopen("machineCode.txt", "w"); 
     char line[100];
     int lineIndex = 0;
 
@@ -78,7 +86,7 @@ int main() {
         int spaceIndex = 0;
         int currentArg = 0;
 
-        printf("\n%s", line);
+        printf("\n\n%s", line);
         //Remove the commas and the rs (which stand for registers)
         removeChar(line, ',');
 
@@ -306,7 +314,7 @@ int main() {
             printf("\nInstruction not found: %s", args[0]);
         }
 
-        printf("\nOpcode: %s", opcodeOut);
+        printf("Opcode: %s", opcodeOut);
         fprintf(outputFile, opcodeOut);
         fprintf(outputFile, "\n");
         lineIndex++;
