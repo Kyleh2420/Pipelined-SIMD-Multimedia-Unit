@@ -26,8 +26,12 @@ use IEEE.NUMERIC_STD.ALL;
 use work.all;
 
 entity instructionBuffer is 
-	Port( clk : in std_logic;
+	Port( 
+	--Inputs
+	clk : in std_logic;
 	filename: in string;
+	
+	--Outputs
 	instruction: out std_logic_vector(24 downto 0));	
 end instructionBuffer;
 
@@ -59,12 +63,13 @@ begin
 				file_close(inputFile);
 				readFile := 1;
 				PC <= 0;
-			--If the program counter has not reached the end fetch the current instruction. Then increment.
+			--If the program counter has not reached the end, increment.
 			elsif(PC < 64) then
-				instruction <= instBuffer(PC);
 				PC <= PC + 1;	
 			end if;
 		end if;
 	end process;
+	-- At any time, the output should be whatever the instruction is
+	instruction <= instBuffer(PC);
 
 end Behavioral;

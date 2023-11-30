@@ -32,7 +32,10 @@ end instructionBuffer_tb;
 
 architecture behavioral of instructionBuffer_tb is
 	signal clk: std_logic := '0';
-	signal filename: string := "machineCode.txt";
+	
+	constant BL_STR :string :="machineCode.txt";
+    signal filename: string(1 to BL_STR'length) := BL_STR ;
+	--signal filename: string(1 to 16) := "machineCode.txt"; --With this singular line of code, vivado didn't want to simulate. The constant above is a workaround
 	signal instruction: std_logic_vector(24 downto 0);
 	
 	constant period : time := 1 us;
