@@ -14,6 +14,7 @@
 -- 
 -- Revision:
 -- Revision 0.01 - File Created
+-- Revision 0.02 - All components connected except forwarding unit
 -- Additional Comments:
 -- 
 ----------------------------------------------------------------------------------
@@ -73,8 +74,20 @@ begin
 												rs2 => id_if_rs2, 
 												rs1 => id_if_rs1, 
 												rd => id_if_rd);
-	
-												
+
+	register_file: entity resgiter_file port map(-- input
+													WR_en => writeEn,
+													R1_addr => id_if_rs1,
+													R2_addr => id_if_rs2,
+													R3_addr => id_if_rs3,
+													Rd_addr => wbu_rdAddress, -- write back unit Rd
+													Rd_data	=> wbu_rdData,
+												--output
+													R1_out => rfRs1Data,
+													R2_out => rfRs2Data,
+													R3_out => rfRs3Data);
+													-- left is entity variable
+													-- right is signal
 												
 	if_ex_register: entity if_exRegister port map(--The Inputs to the register
 													clk => clk,
