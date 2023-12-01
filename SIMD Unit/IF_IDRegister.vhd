@@ -51,7 +51,9 @@ begin
 			instructionOut <= instruction;
 			rs3 <= instruction(19 downto 15);
 			rs2 <= instruction(14 downto 10);
-			rs1 <= instruction(9 downto 5);
+			--Rs1 = Rs1 unless we have a li instruciton. Then, rs1 gets rd.
+			rs1 <= instruction(9 downto 5) when (instruction(24) = '1') else
+					instruction(4 downto 0);
 			rd <= instruction(4 downto 0);
 		end if;
 	end process;
