@@ -51,6 +51,9 @@ architecture structural of multimediaUnit is
 	signal if_ex_rs3Data, if_ex_rs2Data, if_ex_rs1Data: std_logic_vector(127 downto 0);
 	
 --Stage 3
+	signal fwdR3Data: std_logic_vector(127 downto 0);
+	signal fwdR2Data: std_logic_vector(127 downto 0);
+	signal fwdR1Data: std_logic_vector(127 downto 0);
 	signal aluRdData: std_logic_vector(127 downto 0);
 	
 --Stage 4
@@ -96,23 +99,51 @@ begin
 													r3DataIn => rfRs3Data,
 													r2DataIn => rfRs2Data,
 													r1DataIn => rfRs1Data,
-													
-													rs3AddressIn => id_if_rs3,
-													rs2AddressIn => id_if_rs2,
-													rs1AddressIn => id_if_rs1,
+
 													rdAddressIn => id_if_rd,
 													
 													--The output of the register
 													instructionOut => if_ex_Instruction,
 													
-													rs3AddressOut => if_ex_rs3Address,
-													rs2AddressOut => if_ex_rs2Address,
-													rs1AddressOut => if_ex_rs1Address,
 													rdAddressOut => if_ex_rdAddress,
 													
 													r3DataOut => if_ex_rs3Data,
 													r2DataOut => if_ex_rs2Data,
 													r1DataOut => if_ex_rs1Data);
+	
+													
+	fwdMux: entity fwdUnit port map(
+		--Inputs to the Mux
+		exInstruction => if_ex_Instruction,
+		ifInstruction => id_if_instructionOut,
+		
+		r3DataIn => if_ex_rs3Data,
+		r2DataIn => if_ex_rs2Data,
+		r1DataIn => if_ex_rs1Data,
+		
+		exData => aluRdData,
+		
+		ifR3Address => id_if_rs3,
+		ifR2Address => id_if_rs2,
+		ifR1Address => id_if_rs1,
+		ifRdAddress => id_if_rd,
+		
+		exRdAddress => if_ex_rdAddress,
+		
+		--Outputs from the mux
+		r3DataOut => fwdR3Data,
+		r2DataOut => fwdR2Data, 
+		r1DataOut => fwdR1Data 
+		);
+		
+	alu: entity ALU port map(
+							--Inputs to the ALU 
+							wordIn => if_ex_Instruction,
+							rs3 => fwdR3Data,
+							rs2 => fwdR2Data,
+							rs1 => fwdR1Data,
+							rd => aluRdData);			
+													
 													
 	ex_wb_register: entity ex_wbRegister port map( --The Inputs to the register
 													clk => clk,
