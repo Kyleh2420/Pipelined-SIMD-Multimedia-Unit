@@ -319,6 +319,12 @@ int main() {
         fprintf(outputFile, "\n");
         lineIndex++;
     }
+
+    //Once we're done, fill the rest of the machine code with nop instructions
+    while (lineIndex < 64) {
+        fprintf(outputFile, "1100000000000000000000000\n");
+        lineIndex++;
+    }
     fclose(inputFile);
     fclose(outputFile);
     return 0;

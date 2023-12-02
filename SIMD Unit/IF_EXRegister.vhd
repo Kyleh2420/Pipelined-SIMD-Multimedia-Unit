@@ -37,12 +37,18 @@ entity if_exRegister is
 	r2DataIn: in std_logic_vector(127 downto 0);
 	r1DataIn: in std_logic_vector(127 downto 0);
 	
+	rs3AddressIn: in std_logic_vector(4 downto 0);
+	rs2AddressIn: in std_logic_vector(4 downto 0);
+	rs1AddressIn: in std_logic_vector(4 downto 0);
 	rdAddressIn: in std_logic_vector(4 downto 0);
 	
 	
 	--Outputs
 	instructionOut: out std_logic_vector(24 downto 0);
 	
+	rs3AddressOut: out std_logic_vector(4 downto 0);
+	rs2AddressOut: out std_logic_vector(4 downto 0);
+	rs1AddressOut: out std_logic_vector(4 downto 0);
 	rdAddressOut: out std_logic_vector(4 downto 0);
 	
 	r3DataOut: out std_logic_vector(127 downto 0);
@@ -62,6 +68,9 @@ begin
 			--On a rising clock edge, we want to see the asynchronous data sent out. So whatever is in instruction is split
 			instructionOut <= instruction;
 			
+			rs3AddressOut <= rs3AddressIn;
+			rs2AddressOut <= rs2AddressIn;
+			rs1AddressOut <= rs1AddressIn;
 			rdAddressOut <= rdAddressIn;
 			
 			r3DataOut <= r3DataIn;

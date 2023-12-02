@@ -68,6 +68,7 @@ architecture structural of multimediaUnit is
 	signal writeEn: std_logic;
 begin
 	stage1: entity instructionBuffer port map(clk => clk, filename => filenameIn, instruction => instructionBufferOut);
+		
 	id_if_register: entity if_idRegister port map(--The Inputs to the Register
 												clk => clk, 
 												instruction => instructionBufferOut,
@@ -99,12 +100,18 @@ begin
 													r3DataIn => rfRs3Data,
 													r2DataIn => rfRs2Data,
 													r1DataIn => rfRs1Data,
-
+													
+													rs3AddressIn => id_if_rs3,
+													rs2AddressIn => id_if_rs2,
+													rs1AddressIn => id_if_rs1,
 													rdAddressIn => id_if_rd,
 													
 													--The output of the register
 													instructionOut => if_ex_Instruction,
 													
+													rs3AddressOut => if_ex_rs3Address,
+													rs2AddressOut => if_ex_rs2Address,
+													rs1AddressOut => if_ex_rs1Address,
 													rdAddressOut => if_ex_rdAddress,
 													
 													r3DataOut => if_ex_rs3Data,
@@ -114,27 +121,28 @@ begin
 													
 	fwdMux: entity fwdUnit port map(
 		--Inputs to the Mux
+		wbInstruction => ex_wb_instruction,
 		exInstruction => if_ex_Instruction,
-		ifInstruction => id_if_instructionOut,
 		
 		r3DataIn => if_ex_rs3Data,
 		r2DataIn => if_ex_rs2Data,
 		r1DataIn => if_ex_rs1Data,
 		
-		exData => aluRdData,
+		wbData => ex_wb_rdData,
 		
-		ifR3Address => id_if_rs3,
-		ifR2Address => id_if_rs2,
-		ifR1Address => id_if_rs1,
-		ifRdAddress => id_if_rd,
-		
+		exR3Address => if_ex_rs3Address,
+		exR2Address => if_ex_rs2Address,
+		exR1Address => if_ex_rs1Address,
 		exRdAddress => if_ex_rdAddress,
+		
+		wbRdAddress => ex_wb_rdAddress,
 		
 		--Outputs from the mux
 		r3DataOut => fwdR3Data,
 		r2DataOut => fwdR2Data, 
 		r1DataOut => fwdR1Data 
 		);
+		
 		
 	alu: entity ALU port map(
 							--Inputs to the ALU 

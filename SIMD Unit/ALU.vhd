@@ -1871,23 +1871,10 @@ begin
 	variable MSB: integer;
 	variable count: unsigned(15 downto 0) := (others => '0');
 	variable tempRd: unsigned(registerLength downto 0) := (others => '0');
-	
-	variable Rs1_v: std_logic_vector(registerLength-1 downto 0) := (others => '0');
-	variable Rs2_v: std_logic_vector(registerLength-1 downto 0) := (others => '0');
-	variable Rs3_v: std_logic_vector(registerLength-1 downto 0) := (others => '0');
-	variable Rd_v: std_logic_vector(registerLength-1 downto 0) := (others => '0');
-	
-	variable wordIn_v: STD_LOGIC_VECTOR (24 downto 0);
-	
     begin
-    
-    wordIn_v := wordIn;
-    Rs1_v := rs1;
-    Rs2_v := rs2;
-    Rs3_v := rs3;
 		
 		
-    if (wordIn_v(24) = '0') then
+    if (wordIn(24) = '0') then
         --If wordIn[24] == 0, then we load Immediate
         
         --Load a 16-bit Immediate value from the [20:5] instruction field into the 16-bit field specified by the Load Index field [23:21] of the 128-bit register rd. 
@@ -1896,15 +1883,15 @@ begin
         
     
         --Breakdown the wordIn(23:21) into its integer counterpart
-        loadIndex := to_integer(unsigned(wordIn_v(23 downto 21)));
-        
-        --Store the immediate value
-        temp(15 downto 0) := wordIn_v(20 downto 5);
+        loadIndex := to_integer(unsigned(wordIn(23 downto 21)));
         
 		--This is adjusted for the pipeline unit
 		--We will expect the current value of rd to be in rs1 already
 		rd <= rs1;
 		
+        --Store the immediate value
+        temp(15 downto 0) := wordIn(20 downto 5);
+        
         --Write it to the paticular register index required
         rd((loadIndex+1)*16-1 downto (loadIndex*16)) <= temp(15 downto 0);
   
@@ -1963,7 +1950,7 @@ begin
             when others => selectOpcode <= NUL;
         end case;   
     end if;
-    rd((loadIndex+1)*16-1 downto (loadIndex*16)) <= temp(15 downto 0);
+    
     end process;
 
 end Behavioral;
