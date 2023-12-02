@@ -40,12 +40,20 @@ entity writeBackUnit is
 end writeBackUnit;
 
 
-
 architecture behavioral of writeBackUnit is
+	process	  
 
-begin
-	rdDataOut <= rdDataIn;
-	rdAddressOut <= rdAddressIn;
-	
-	writeEn <= '0' when (instruction(24 downto 23) = "11" and instruction(18 downto 15) = "0000") else '1';
+    variable v_OLINE     : line;
+    variable v_ADD_TERM1 : std_logic_vector(c_WIDTH-1 downto 0);
+    variable v_ADD_TERM2 : std_logic_vector(c_WIDTH-1 downto 0);
+    variable v_SPACE     : character;
+	variable tempInst: std_logic_vector(24 downto 0);
+	begin
+		rdDataOut <= rdDataIn;
+		rdAddressOut <= rdAddressIn;
+		
+		writeEn <= '0' when (instruction(24 downto 23) = "11" and instruction(18 downto 15) = "0000") else '1';
+		
+		file_op
+	end process;
 end behavioral;
