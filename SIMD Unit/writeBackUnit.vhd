@@ -47,5 +47,6 @@ begin
 	rdDataOut <= rdDataIn;
 	rdAddressOut <= rdAddressIn;
 	
+	--Write enable is 0 when the instruction is NOP
 	writeEn <= '0' when (instruction(24 downto 23) = "11" and instruction(18 downto 15) = "0000") else '1';
 end behavioral;
