@@ -95,7 +95,7 @@ begin
 		port map (clk => clk, filenameIn => inputFile, filenameOut => outputFile,
 	       instr => instr, opcode => opcode, func => func, field => field,	     --instructions for each stage
 	       rs1_data => rs1_data, rs2_data => rs2_data, rs3_data => rs3_data,	 --stage 1
-	       mux_data1 => mux_data1, mux_data2 => mux_data2, mux_data3 => mux_data3, mux_data => mux_data, --stage 2
+	       mux_data1 => mux_data1, mux_data2 => mux_data2, mux_data3 => mux_data3, --stage 2
 	       alu_in1 => alu_in1, alu_in2 => alu_in2, alu_in3 => alu_in3, alu_out => alu_out,				 --stage 3
 	       wb_data => wb_data,
 	       WE => WE, rd => rd,
