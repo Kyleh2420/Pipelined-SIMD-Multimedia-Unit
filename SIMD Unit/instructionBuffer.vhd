@@ -32,12 +32,14 @@ entity instructionBuffer is
 	filename: in string;
 	
 	--Outputs
-	instruction: out std_logic_vector(24 downto 0));	
+	instruction: out std_logic_vector(24 downto 0);
+	pcOutput: out integer);
 end instructionBuffer;
 
 
 architecture Behavioral of instructionBuffer is
 	signal PC: integer := 0;
+
 	
 	type instArray is array (0 to 63) of std_logic_vector(24 downto 0);
 	signal instBuffer: instArray;
@@ -50,7 +52,8 @@ begin
 		variable tempInst: std_logic_vector(24 downto 0);
 	begin
 		--On each rising edge
-		if(rising_edge(clk)) then		 
+		if(rising_edge(clk)) then
+			PC <= 0;	
 			--If the file hasn't been read into memory, read the file. Then, set readFile to 1 so that we won't enter.
 			if(readFile = 0) then 
 				file_open(inputFile, filename, READ_MODE);
@@ -64,12 +67,13 @@ begin
 				readFile := 1;
 				PC <= 0;
 			--If the program counter has not reached the end, increment.
-			elsif(PC < 64) then
+			elsif(PC < 63) then
 				PC <= PC + 1;	
 			end if;
 		end if;
 	end process;
 	-- At any time, the output should be whatever the instruction is
 	instruction <= instBuffer(PC);
+	pcOutput <= PC;
 
 end Behavioral;
