@@ -7,14 +7,18 @@
 
 
 void removeChar(char *str, char c) {
-    int i, j;
-    int len = strlen(str);
-    for (i = j = 0; i < len; i++) {
-        if (str[i] != c) {
-            str[j++] = str[i];
+    //If the string is null, do nothing.
+    //Otherwise, continue on
+    if (str != NULL) {
+        int i, j;
+        int len = strlen(str);
+        for (i = j = 0; i < len; i++) {
+            if (str[i] != c) {
+                str[j++] = str[i];
+            }
         }
+        str[j] = '\0';
     }
-    str[j] = '\0';
 }
 
 void slice(const char* str, char* result, size_t start, size_t end) {
@@ -79,7 +83,7 @@ int main() {
     //Go line by line (Or until we hit 64 lines, our limit for the instruction buffer)
     while (fgets(line, sizeof(line), inputFile) && lineIndex < 64) {
         //There can be up to 5 arguements per line, each limited to 7 characters long + 1 null terminating character
-        char args[5][7+1] = { '\0' };
+        char* args[5] = { '\0' };
 
         //The OPCode to be printed to the outputfile. Is 25 characters long + 1 null terminating character
         char opcodeOut[25+1] = { '\0' };
@@ -93,7 +97,14 @@ int main() {
         if (line[0] != '/' && line[1] != '/' && line[0] != '\n'){
                 //Remove the commas and the rs (which stand for registers)
             removeChar(line, ',');
+            removeChar(line, '\n');
 
+            //First, make sure that everything is lowercase
+            for (int i = 0; line[i]; i++) {
+                line[i] = tolower(line[i]);
+            }
+/*
+            //Tokenize Version 1
             //Going char by char in the line, we will also parse out the arguements to put in the 2d array args
             for (int i = 0; line[i]; i++) {
                 //First, make sure that everything is lowercase
@@ -106,14 +117,33 @@ int main() {
                     //Copy the string to the args array, starting from the spaceIndex character and for i-spaceIndex characters
                     strncpy(args[currentArg], line+spaceIndex, i-spaceIndex);
                     //strncpy does not add a null terminator. We must do that (Even though the whole array is already initialized to \0, this is just good practice)
-                    args[currentArg][i-spaceIndex] = '\0';
+                    args[currentArg][i-spaceIndex] = '\0';  
                     spaceIndex = i+1;
                     currentArg++;
                 }
             }
-            //Arguments have been seperated by spaces
+            */
 
+
+            //Using built in tokenizer
+            int j = 0;
+            char* token;
+            char delimiter[] = " ";
+            token = strtok(line, delimiter);
+            args[j] = token;
+            j++;
+            while (token) {
+                token = strtok(NULL, delimiter);
+                args[j] = token;
+                j++;
+            }
+
+
+            //Arguments have been seperated by spaces
             //Remove the r (Which stands for registers) from every arguement beyond arg[0]
+            //removeChar(args[1], 'r');
+            
+            
             for (int i = 1; i < 5; i++) {
                 removeChar(args[i], 'r');
             }
@@ -316,6 +346,8 @@ int main() {
                 strcat(opcodeOut, char2Bin(args[1], 5, 10));
             } else {
                 printf("\nInstruction not found: %s", args[0]);
+                exit(1);
+
             }
 
             printf("Opcode: %s", opcodeOut);

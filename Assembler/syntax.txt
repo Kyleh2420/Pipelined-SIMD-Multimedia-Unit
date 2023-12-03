@@ -1,10 +1,12 @@
                                         Rules to note
 ---------------------------------------------------------------------------------------------
 1. Instruction arguments should be seperated using spaces. Commas are allowed for human readability.
-2. There should always be a \n [Newline character] at the end of each instruction (That means the last one too)
-3. Registers are to be written with a [r] prepending the register number.
-4. Immediate values are to be written in hex with 0x prepending the immediate value.
-5. Destination registers always come first. The order is shown on the right side of the following document.
+2. Registers are to be written with a [r] prepending the register number.
+3. Immediate values are to be written in hex with 0x prepending the immediate value.
+4. Destination registers always come first. The order is shown on the right side of the following document.
+5. Comments are available in new lines only uing "//". (No in line commenting)
+6. Empty lines are allowed. (Only "\n")
+7. Upper or lowercase does not matter
 
 
 li [0-7] 0xFFFF r[0-31]                  li {Destination Register} {Load Index} {16-bit Imm} 
