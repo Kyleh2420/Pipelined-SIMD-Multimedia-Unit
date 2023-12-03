@@ -89,7 +89,8 @@ int main() {
         printf("\n\n%s", line);
 
         //Check for comments, denoted by a "//" as the first 2 characters
-        if (line[0] != '/' && line[1] != '/') {
+        //Also check for just an empty line.
+        if (line[0] != '/' && line[1] != '/' && line[0] != '\n'){
                 //Remove the commas and the rs (which stand for registers)
             removeChar(line, ',');
 
