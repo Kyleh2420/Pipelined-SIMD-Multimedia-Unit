@@ -52,8 +52,7 @@ entity fwdUnit is
 	--Outputs
 	r3DataOut: out std_logic_vector(127 downto 0);
 	r2DataOut: out std_logic_vector(127 downto 0);
-	r1DataOut: out std_logic_vector(127 downto 0);
-	
+	r1DataOut: out std_logic_vector(127 downto 0)
 	);
 end fwdUnit;
 

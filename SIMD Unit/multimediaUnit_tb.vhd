@@ -43,8 +43,8 @@ architecture behavioral of multimediaUnit_tb is
 	--might not need this eof thing  -- update, just a signal to say finished writing to txt file
 	signal eof: std_logic := '0';
 
-	type regArray is array (0 to 31) of std_logic_vector(127 downto 0);
-	signal registers: regArray;  
+--  type regArray is array (0 to 31) of std_logic_vector(127 downto 0);
+--	signal registers: regArray;  
 --	type STD_FILE is file of std_logic_vector(127 downto 0);	  -- define vector size
 --	file fptrwr : STD_FILE;										  -- declare wr file pointer
 	
@@ -73,28 +73,12 @@ begin
 				-- probably need to insert code to write results file here.
 				-- format:
 				-- Cycle 1
-				-- ID
-				-- 
-				-- 
+				-- ID: instr
+				-- RF: instr rs1_data rs2_data rs3_data rd rd_data 
+				-- ALU: instr rd rd_data
 				-- WB: instr rd rd_data
 			end loop;
 		-- simulation ends after 67 clocks!
-		
-		-- figure out how to output 1 result text file
-		if(fileRead = 0) then
-			file_open(fileStatWr, outputFile, filenameOut, WRITE_MODE);		 -- acc open the file
-			for i in 0 to 31 loop
-				--readline(outputFile, lineContents);
-				write(row, registers(i), right, 128);
-			end loop;
-			eof <= '1';		-- indicate eof
-			file_close(outputFile);	-- close outputFile "memory.txt"
-		-- elsif(PC < 67) then    -- have some sort of mechanism to keep the file printout until the end of 
-		end if;
-		
-		if(rising_edge(clk)) then
-			write(row, registers(i), right, 15);
-		end if;
 		
 			std.env.finish;
 		end process;
