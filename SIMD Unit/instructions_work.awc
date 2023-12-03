@@ -1,0 +1,90 @@
+<config>
+    <version>
+        3.1
+    </version>
+    <comment>
+    </comment>
+    <databases>
+        <database id="">*virtual*</database>
+        <database id="LOCAL___df446c650ef0de3c4800">instructions_work.asdb</database>
+    </databases>
+    <gridshown/>
+    <signallists>
+        <signallist id="0">
+        <signal>/multimediaUnit_tb/UUT/clk</signal>
+        <signal>/multimediaUnit_tb/UUT/id_if_rs3</signal>
+        <signal>/multimediaUnit_tb/UUT/id_if_rs2</signal>
+        <signal>/multimediaUnit_tb/UUT/id_if_rs1</signal>
+        <signal>/multimediaUnit_tb/UUT/id_if_rd</signal>
+        <signal>/multimediaUnit_tb/UUT/instructionBufferOut</signal>
+        <signal>/multimediaUnit_tb/UUT/id_if_instructionOut</signal>
+        <signal>/multimediaUnit_tb/UUT/PC</signal>
+        <signal>/multimediaUnit_tb/UUT/rfRs3Data</signal>
+        <signal>/multimediaUnit_tb/UUT/rfRs2Data</signal>
+        <signal>/multimediaUnit_tb/UUT/rfRs1Data</signal>
+        <signal>/multimediaUnit_tb/UUT/if_ex_Instruction</signal>
+        <signal>/multimediaUnit_tb/UUT/if_ex_rs3Address</signal>
+        <signal>/multimediaUnit_tb/UUT/if_ex_rs2Address</signal>
+        <signal>/multimediaUnit_tb/UUT/if_ex_rs1Address</signal>
+        <signal>/multimediaUnit_tb/UUT/if_ex_rdAddress</signal>
+        <signal>/multimediaUnit_tb/UUT/if_ex_rs3Data</signal>
+        <signal>/multimediaUnit_tb/UUT/if_ex_rs2Data</signal>
+        <signal>/multimediaUnit_tb/UUT/if_ex_rs1Data</signal>
+        <signal>/multimediaUnit_tb/UUT/fwdR3Data</signal>
+        <signal>/multimediaUnit_tb/UUT/fwdR2Data</signal>
+        <signal>/multimediaUnit_tb/UUT/fwdR1Data</signal>
+        <signal>/multimediaUnit_tb/UUT/aluRdData</signal>
+        <signal>/multimediaUnit_tb/UUT/ex_wb_instruction</signal>
+        <signal>/multimediaUnit_tb/UUT/ex_wb_rdData</signal>
+        <signal>/multimediaUnit_tb/UUT/ex_wb_rdAddress</signal>
+        <signal>/multimediaUnit_tb/UUT/wbu_rdData</signal>
+        <signal>/multimediaUnit_tb/UUT/wbu_rdAddress</signal>
+        <signal>/multimediaUnit_tb/UUT/writeEn</signal>
+        </signallist>
+        <signallist id="1">
+        <signal>/multimediaUnit_tb/UUT/stage1/clk</signal>
+        <signal>/multimediaUnit_tb/UUT/stage1/pcOutput</signal>
+        <signal>/multimediaUnit_tb/UUT/stage1/instruction</signal>
+        </signallist>
+        <signallist id="2">
+        <signal>/multimediaUnit_tb/UUT/id_if_register/instructionOut</signal>
+        </signallist>
+    </signallists>
+    <timebases>
+        <timebase id="0">
+            <time start_time="0" end_time="86455250" />
+        </timebase>
+    </timebases>
+    <prefbases>
+        <prefbase id="0" >
+        </prefbase>
+        <prefbase id="1" >
+        </prefbase>
+        <prefbase id="2" >
+        </prefbase>
+    </prefbases>
+    <bookmarkbases>
+        <bookmarks id="0">
+        </bookmarks>
+        <bookmarks id="1">
+        </bookmarks>
+        <bookmarks id="2">
+        </bookmarks>
+    </bookmarkbases>
+    <cursorbases>
+        <cursors id="0">
+            <cursor value="9856030" label="Cursor 1" locked="0" />
+        </cursors>
+    </cursorbases>
+    <measurementbases>
+    </measurementbases>
+    <commentbases>
+        <comments id="0">
+        </comments>
+    </commentbases>
+    <views>
+        <view signallist="0" propertybase="0" prefbase="-1" type="1" bookmarks="0" cursors="0" measurements="-1" comments="-1" />
+        <view signallist="1" propertybase="1" prefbase="-1" type="1" bookmarks="1" cursors="0" measurements="-1" comments="-1" />
+        <view signallist="2" propertybase="2" prefbase="-1" type="1" bookmarks="2" cursors="0" measurements="-1" comments="-1" />
+    </views>
+</config>

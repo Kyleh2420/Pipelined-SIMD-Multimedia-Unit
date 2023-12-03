@@ -41,8 +41,6 @@ end writeBackUnit;
 
 
 architecture behavioral of writeBackUnit is
-	process	  
-
 begin
 	rdDataOut <= rdDataIn;
 	rdAddressOut <= rdAddressIn;

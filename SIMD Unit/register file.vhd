@@ -62,14 +62,28 @@ begin
 	process(all) 
    --  draft for instruction names: instructionBufferOut, id_if_instructionOut, if_ex_Instruction, ex_wb_instruction 
 	begin
-		if(WR_en='1') then -- when write enable = 1, 
-			-- write back data into Rd in register file at the provided Rd address
+	if(WR_en='1') then -- when write enable = 1, 
+		-- write back data into Rd in register file at the provided Rd address
 			registers(to_integer(unsigned(Rd_addr))) <= Rd_Data;
+			-- The index of the registers array needs to be integer so
+			-- converts addr from std_logic_vector -> Unsigned -> Interger using numeric_std library
 			
-			--for i in 0 to 31 loop
+			
+			
+			
+		end if;
+		--for i in 0 to 31 loop
 			--	ri <= registers(i);
 			-- end loop;
-			r0 <= registers(0);
+		R1_out <= registers(to_integer(unsigned(R1_addr)));
+		R2_out <= registers(to_integer(unsigned(R2_addr)));
+		R3_out <= registers(to_integer(unsigned(R3_addr)));
+		
+	end process;
+	-- Data to be read out 
+	
+	
+	r0 <= registers(0);
 			r1 <= registers(1);
 			r2 <= registers(2);
 			r3 <= registers(3);
@@ -101,13 +115,5 @@ begin
 			r29 <= registers(29);
 			r30 <= registers(30);
 			r31 <= registers(31);
-			-- The index of the registers array needs to be integer so
-			-- converts addr from std_logic_vector -> Unsigned -> Interger using numeric_std library
-		end if;
-		R1_out <= registers(to_integer(unsigned(R1_addr)));
-		R2_out <= registers(to_integer(unsigned(R2_addr)));
-		R3_out <= registers(to_integer(unsigned(R3_addr)));
-		
-	end process;
-	 -- Data to be read out
+	
 end comb;

@@ -52,8 +52,7 @@ begin
 		variable tempInst: std_logic_vector(24 downto 0);
 	begin
 		--On each rising edge
-		if(rising_edge(clk)) then
-			PC <= 0;	
+		if(rising_edge(clk)) then	
 			--If the file hasn't been read into memory, read the file. Then, set readFile to 1 so that we won't enter.
 			if(readFile = 0) then 
 				file_open(inputFile, filename, READ_MODE);
@@ -68,7 +67,9 @@ begin
 				PC <= 0;
 			--If the program counter has not reached the end, increment.
 			elsif(PC < 63) then
-				PC <= PC + 1;	
+				PC <= PC + 1;
+			else 
+				PC <= PC;
 			end if;
 		end if;
 	end process;
